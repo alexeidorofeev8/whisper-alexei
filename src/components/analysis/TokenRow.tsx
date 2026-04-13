@@ -5,6 +5,7 @@ import { motion, LayoutGroup } from "framer-motion";
 import { AnalysisResult, GrammarError } from "@/lib/types";
 import { AnimatedToken } from "./AnimatedToken";
 import { WordOrderArrows } from "./WordOrderArrows";
+import { useAppStore } from "@/store/useAppStore";
 
 function buildErrorMap(errors: GrammarError[]): Map<number, GrammarError> {
   const map = new Map<number, GrammarError>();
@@ -36,6 +37,7 @@ export function TokenRow({
   messageId: string;
 }) {
   const { original_tokens, corrected, errors } = analysis;
+  const targetLanguage = useAppStore((s) => s.targetLanguage);
   const wordOrderErrors = errors.filter((e) => e.type === "word_order");
   const hasWordOrder = wordOrderErrors.length > 0;
 
@@ -55,7 +57,7 @@ export function TokenRow({
         {/* Row 1: Original */}
         <div ref={containerRef} className="relative">
           <p className="text-xs text-slate-400 mb-1.5 uppercase tracking-wide font-medium">
-            Deine Aussage
+            {targetLanguage === "en" ? "Your input" : "Deine Aussage"}
           </p>
           <div className="flex flex-wrap gap-1.5 min-h-[2rem]">
             {original_tokens.map((token, i) => {
@@ -105,7 +107,7 @@ export function TokenRow({
           transition={{ delay: 0.8 }}
         >
           <p className="text-xs text-slate-400 mb-1.5 uppercase tracking-wide font-medium">
-            Korrigiert
+            {targetLanguage === "en" ? "Corrected" : "Korrigiert"}
           </p>
           <div className="flex flex-wrap gap-1.5 min-h-[2rem]">
             {correctedTokens.map((token, i) => {

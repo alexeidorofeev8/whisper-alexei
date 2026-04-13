@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Copy, Check } from "lucide-react";
 import { useState } from "react";
+import { useAppStore } from "@/store/useAppStore";
 
 function AlternativeItem({ text, index }: { text: string; index: number }) {
   const [copied, setCopied] = useState(false);
@@ -30,7 +31,7 @@ function AlternativeItem({ text, index }: { text: string; index: number }) {
       <button
         onClick={handleCopy}
         className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-slate-600 shrink-0 mt-0.5"
-        aria-label="Kopieren"
+        aria-label="Copy"
       >
         {copied ? (
           <Check className="w-3.5 h-3.5 text-orange-500" />
@@ -43,12 +44,13 @@ function AlternativeItem({ text, index }: { text: string; index: number }) {
 }
 
 export function AlternativesList({ alternatives }: { alternatives: string[] }) {
+  const targetLanguage = useAppStore((s) => s.targetLanguage);
   if (!alternatives.length) return null;
 
   return (
     <div className="flex flex-col gap-1.5">
       <p className="text-xs text-slate-400 uppercase tracking-wide font-medium mb-1">
-        Alternativen
+        {targetLanguage === "en" ? "Alternatives" : "Alternativen"}
       </p>
       {alternatives.map((alt, i) => (
         <AlternativeItem key={i} text={alt} index={i} />

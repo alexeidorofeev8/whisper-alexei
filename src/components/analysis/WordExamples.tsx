@@ -5,6 +5,7 @@ import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { WordExample } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { useAppStore } from "@/store/useAppStore";
 
 function WordItem({ item, index }: { item: WordExample; index: number }) {
   const [open, setOpen] = useState(false);
@@ -42,12 +43,13 @@ function WordItem({ item, index }: { item: WordExample; index: number }) {
 }
 
 export function WordExamples({ examples }: { examples: WordExample[] }) {
+  const targetLanguage = useAppStore((s) => s.targetLanguage);
   if (!examples.length) return null;
 
   return (
     <div className="flex flex-col gap-1.5">
       <p className="text-xs text-slate-400 uppercase tracking-wide font-medium mb-1">
-        Wortgebrauch
+        {targetLanguage === "en" ? "Word usage" : "Wortgebrauch"}
       </p>
       {examples.map((item, i) => (
         <WordItem key={item.word} item={item} index={i} />
