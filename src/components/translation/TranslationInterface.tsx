@@ -7,7 +7,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { TranslationDifficulty } from "@/lib/types";
 import { TranslationPhraseCard } from "./TranslationPhraseCard";
 import { TranslationFeedback } from "./TranslationFeedback";
-import { VoiceInput } from "@/components/voice/VoiceInput";
+import { InputBar } from "@/components/voice/InputBar";
 import { TypingIndicator } from "@/components/chat/TypingIndicator";
 import { useAutoScroll } from "@/hooks/useAutoScroll";
 
@@ -24,6 +24,7 @@ export function TranslationInterface() {
     setTranslationDifficulty,
     messages,
     isAnalyzing,
+    targetLanguage,
   } = useAppStore();
 
   const { fetchPhrase, evaluate } = useTranslation();
@@ -155,7 +156,10 @@ export function TranslationInterface() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
-              <VoiceInput onFinal={evaluate} />
+              <InputBar
+                  onSubmit={evaluate}
+                  placeholder={targetLanguage === "en" ? "Speak or type your translation…" : "Übersetzung sprechen oder eintippen…"}
+                />
             </motion.div>
           )}
         </AnimatePresence>
