@@ -133,6 +133,7 @@ export function TranslationInterface() {
       <div className="border-t border-slate-200 bg-white/90 backdrop-blur-xl -mx-4 px-4 mt-auto sticky bottom-0">
         <AnimatePresence mode="wait">
           {hasResult ? (
+
             <motion.div
               key="next"
               initial={{ opacity: 0, y: 8 }}
@@ -149,7 +150,7 @@ export function TranslationInterface() {
                 Следующая фраза
               </button>
             </motion.div>
-          ) : (
+          ) : currentPhrase ? (
             <motion.div
               key="mic"
               initial={{ opacity: 0 }}
@@ -161,7 +162,7 @@ export function TranslationInterface() {
                   placeholder={targetLanguage === "en" ? "Speak or type your translation…" : "Übersetzung sprechen oder eintippen…"}
                 />
             </motion.div>
-          )}
+          ) : null}
         </AnimatePresence>
       </div>
     </div>
