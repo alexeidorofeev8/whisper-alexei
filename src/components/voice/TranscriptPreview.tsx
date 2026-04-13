@@ -13,7 +13,7 @@ export function TranscriptPreview() {
           initial={{ opacity: 0, y: 4 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -4 }}
-          className="text-sm text-zinc-400 italic text-center px-4 max-w-md truncate"
+          className="text-sm text-slate-500 italic text-center px-4 max-w-md truncate"
         >
           {interimTranscript}
         </motion.p>

@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import { useAppStore } from "@/store/useAppStore";
 
-// Web Speech API typings (not fully covered in all TS lib versions)
 interface ISpeechRecognition extends EventTarget {
   lang: string;
   interimResults: boolean;
@@ -38,43 +37,52 @@ declare global {
 
 export function useSpeechRecognition(onFinal: (transcript: string) => void) {
   const recognitionRef = useRef<ISpeechRecognition | null>(null);
+  const accumulatedRef = useRef(""); // накапливаем все финальные фрагменты
   const { setRecordingState, setInterimTranscript, setFinalTranscript } =
     useAppStore();
 
-  const isSupported =
-    typeof window !== "undefined" &&
-    ("SpeechRecognition" in window || "webkitSpeechRecognition" in window);
+  const [isSupported, setIsSupported] = useState(false);
+
+  useEffect(() => {
+    setIsSupported(
+      "SpeechRecognition" in window || "webkitSpeechRecognition" in window
+    );
+  }, []);
 
   const start = useCallback(() => {
-    if (typeof window === "undefined") return;
+    if (!isSupported) return;
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) return;
+
+    accumulatedRef.current = "";
 
     const recognition = new SR();
     recognition.lang = "de-DE";
     recognition.interimResults = true;
-    recognition.continuous = false;
+    recognition.continuous = true;   // не останавливаться на паузах
     recognition.maxAlternatives = 1;
 
     recognition.onstart = () => setRecordingState("recording");
 
     recognition.onresult = (event) => {
       let interim = "";
-      let final = "";
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const t = event.results[i][0].transcript;
-        if (event.results[i].isFinal) final += t;
-        else interim += t;
+        if (event.results[i].isFinal) {
+          accumulatedRef.current += (accumulatedRef.current ? " " : "") + t.trim();
+        } else {
+          interim = t;
+        }
       }
-      if (interim) setInterimTranscript(interim);
-      if (final) {
-        setFinalTranscript(final);
-        setInterimTranscript("");
-        onFinal(final.trim());
-      }
+      // показываем накопленное + текущий промежуточный результат
+      setInterimTranscript(
+        (accumulatedRef.current + (interim ? " " + interim : "")).trim()
+      );
     };
 
-    recognition.onerror = () => {
+    recognition.onerror = (e) => {
+      // network/no-speech ошибки — не падаем, продолжаем
+      if (e.error === "no-speech") return;
       setRecordingState("error");
       setTimeout(() => setRecordingState("idle"), 2000);
     };
@@ -82,6 +90,12 @@ export function useSpeechRecognition(onFinal: (transcript: string) => void) {
     recognition.onend = () => {
       setRecordingState("idle");
       setInterimTranscript("");
+      const final = accumulatedRef.current.trim();
+      accumulatedRef.current = "";
+      if (final) {
+        setFinalTranscript(final);
+        onFinal(final);
+      }
     };
 
     recognitionRef.current = recognition;
@@ -89,6 +103,7 @@ export function useSpeechRecognition(onFinal: (transcript: string) => void) {
   }, [isSupported, onFinal, setRecordingState, setInterimTranscript, setFinalTranscript]);
 
   const stop = useCallback(() => {
+    // stop() → дождаться onend → там вызовем onFinal
     recognitionRef.current?.stop();
   }, []);
 

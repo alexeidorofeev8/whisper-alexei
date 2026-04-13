@@ -3,11 +3,11 @@
 import { useAppStore } from "@/store/useAppStore";
 
 const LEVEL_COLORS: Record<string, string> = {
-  A2: "text-zinc-400 bg-zinc-800",
-  B1: "text-blue-300 bg-blue-500/15",
-  B2: "text-indigo-300 bg-indigo-500/15",
-  C1: "text-violet-300 bg-violet-500/15",
-  C2: "text-emerald-300 bg-emerald-500/15",
+  A2: "text-slate-600 bg-slate-100 border border-slate-200",
+  B1: "text-blue-700 bg-blue-50 border border-blue-200",
+  B2: "text-indigo-700 bg-indigo-50 border border-indigo-200",
+  C1: "text-violet-700 bg-violet-50 border border-violet-200",
+  C2: "text-teal-700 bg-teal-50 border border-teal-200",
 };
 
 export function SessionStats() {
@@ -17,12 +17,12 @@ export function SessionStats() {
   return (
     <div className="flex items-center gap-2">
       {totalErrors > 0 && (
-        <span className="text-xs text-zinc-500">
+        <span className="text-xs text-slate-400">
           {totalErrors} Fehler korrigiert
         </span>
       )}
       <span
-        className={`text-xs px-2 py-0.5 rounded-full font-semibold ${LEVEL_COLORS[sessionLevel] ?? "text-zinc-400 bg-zinc-800"}`}
+        className={`text-xs px-2 py-0.5 rounded-full font-semibold ${LEVEL_COLORS[sessionLevel] ?? "text-slate-600 bg-slate-100"}`}
       >
         {sessionLevel}
       </span>

@@ -18,19 +18,19 @@ function AlternativeItem({ text, index }: { text: string; index: number }) {
       initial={{ opacity: 0, y: 4 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.45 + index * 0.06 }}
-      className="group flex items-center justify-between gap-3 px-3 py-2 bg-zinc-800/60 border border-white/5 rounded-lg hover:border-white/10 transition-colors"
+      className="group flex items-center justify-between gap-3 px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg hover:border-slate-300 transition-colors"
     >
       <div className="flex items-center gap-2 min-w-0">
-        <span className="text-xs text-zinc-600 font-mono shrink-0">{index + 1}.</span>
-        <p className="text-sm text-zinc-200 truncate">{text}</p>
+        <span className="text-xs text-slate-400 font-mono shrink-0">{index + 1}.</span>
+        <p className="text-sm text-slate-700 truncate">{text}</p>
       </div>
       <button
         onClick={handleCopy}
-        className="opacity-0 group-hover:opacity-100 transition-opacity text-zinc-500 hover:text-zinc-300 shrink-0"
+        className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-slate-600 shrink-0"
         aria-label="Kopieren"
       >
         {copied ? (
-          <Check className="w-3.5 h-3.5 text-emerald-400" />
+          <Check className="w-3.5 h-3.5 text-emerald-600" />
         ) : (
           <Copy className="w-3.5 h-3.5" />
         )}
@@ -44,7 +44,7 @@ export function AlternativesList({ alternatives }: { alternatives: string[] }) {
 
   return (
     <div className="flex flex-col gap-1.5">
-      <p className="text-xs text-zinc-500 uppercase tracking-wide font-medium mb-1">
+      <p className="text-xs text-slate-400 uppercase tracking-wide font-medium mb-1">
         Alternativen
       </p>
       {alternatives.map((alt, i) => (

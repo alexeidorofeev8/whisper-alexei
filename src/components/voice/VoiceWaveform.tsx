@@ -10,23 +10,15 @@ export function VoiceWaveform({ active }: { active: boolean }) {
       {BARS.map((phase, i) => (
         <motion.div
           key={i}
-          className="w-[3px] rounded-full bg-indigo-400"
+          className="w-[3px] rounded-full bg-teal-500"
           animate={
             active
-              ? {
-                  scaleY: [0.3, phase, 0.3],
-                  opacity: [0.6, 1, 0.6],
-                }
+              ? { scaleY: [0.3, phase, 0.3], opacity: [0.6, 1, 0.6] }
               : { scaleY: 0.2, opacity: 0.3 }
           }
           transition={
             active
-              ? {
-                  duration: 0.8,
-                  repeat: Infinity,
-                  delay: i * 0.1,
-                  ease: "easeInOut",
-                }
+              ? { duration: 0.8, repeat: Infinity, delay: i * 0.1, ease: "easeInOut" }
               : { duration: 0.3 }
           }
           style={{ height: "100%", transformOrigin: "center" }}

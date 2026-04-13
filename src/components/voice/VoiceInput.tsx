@@ -44,20 +44,20 @@ export function VoiceInput() {
             relative flex items-center justify-center w-16 h-16 rounded-full
             transition-colors duration-200 outline-none
             ${isRecording
-              ? "bg-red-500/20 border-2 border-red-500 text-red-400"
+              ? "bg-red-50 border-2 border-red-400 text-red-600"
               : isError
-              ? "bg-red-900/30 border-2 border-red-700 text-red-500"
+              ? "bg-red-50 border-2 border-red-300 text-red-400"
               : isDisabled
-              ? "bg-zinc-800/50 border-2 border-zinc-700 text-zinc-600 cursor-not-allowed"
-              : "bg-indigo-500/10 border-2 border-indigo-500/50 text-indigo-400 hover:bg-indigo-500/20 hover:border-indigo-400"
+              ? "bg-slate-100 border-2 border-slate-200 text-slate-400 cursor-not-allowed"
+              : "bg-teal-50 border-2 border-teal-300 text-teal-600 hover:bg-teal-100 hover:border-teal-400"
             }
           `}
           aria-label={isRecording ? "Aufnahme stoppen" : "Aufnahme starten"}
         >
           {isRecording && (
             <motion.span
-              className="absolute inset-0 rounded-full border-2 border-red-500"
-              animate={{ scale: [1, 1.4], opacity: [0.6, 0] }}
+              className="absolute inset-0 rounded-full border-2 border-red-400"
+              animate={{ scale: [1, 1.4], opacity: [0.5, 0] }}
               transition={{ duration: 1.2, repeat: Infinity, ease: "easeOut" }}
             />
           )}
@@ -83,13 +83,13 @@ export function VoiceInput() {
         </AnimatePresence>
       </div>
 
-      <p className="text-xs text-zinc-600">
+      <p className="text-xs text-slate-400">
         {!isSupported
           ? "Web Speech API nicht unterstützt — nutze Chrome"
           : isAnalyzing
           ? "Analysiere..."
           : isRecording
-          ? "Sprich jetzt — klicke zum Stoppen"
+          ? "Sprich — klicke zum Stoppen"
           : isError
           ? "Fehler — bitte erneut versuchen"
           : "Klicke und sprich auf Deutsch"}

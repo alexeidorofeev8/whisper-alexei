@@ -40,11 +40,9 @@ export function TokenRow({
   const hasWordOrder = wordOrderErrors.length > 0;
 
   const origErrorMap = buildErrorMap(errors);
-
   const correctedTokens = corrected
     .split(/(\s+)/)
     .filter((t) => t.trim().length > 0);
-
   const correctedErrorMap = buildCorrectedErrorMap(errors);
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -56,7 +54,7 @@ export function TokenRow({
       <LayoutGroup id={`tokens-${messageId}`}>
         {/* Row 1: Original */}
         <div ref={containerRef} className="relative">
-          <p className="text-xs text-zinc-600 mb-1.5 uppercase tracking-wide">
+          <p className="text-xs text-slate-400 mb-1.5 uppercase tracking-wide font-medium">
             Deine Aussage
           </p>
           <div className="flex flex-wrap gap-1.5 min-h-[2rem]">
@@ -97,16 +95,16 @@ export function TokenRow({
           initial={{ scaleX: 0 }}
           animate={{ scaleX: 1 }}
           transition={{ delay: 0.5, duration: 0.3 }}
-          className="h-px bg-white/5 origin-left"
+          className="h-px bg-slate-100 origin-left"
         />
 
-        {/* Row 2: Corrected tokens */}
+        {/* Row 2: Corrected */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
         >
-          <p className="text-xs text-zinc-600 mb-1.5 uppercase tracking-wide">
+          <p className="text-xs text-slate-400 mb-1.5 uppercase tracking-wide font-medium">
             Korrigiert
           </p>
           <div className="flex flex-wrap gap-1.5 min-h-[2rem]">

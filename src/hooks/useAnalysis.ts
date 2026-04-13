@@ -7,7 +7,11 @@ export function useAnalysis() {
   const { addMessage, setIsAnalyzing, incrementErrors, setSessionLevel } =
     useAppStore();
 
-  const analyze = async (transcript: string) => {
+  const analyze = async (rawTranscript: string) => {
+    // Speech API пишет строчными — капитализируем первую букву
+    const transcript =
+      rawTranscript.charAt(0).toUpperCase() + rawTranscript.slice(1);
+
     addMessage({
       id: crypto.randomUUID(),
       role: "user",

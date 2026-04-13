@@ -12,7 +12,7 @@ export function ErrorList({ errors }: { errors: GrammarError[] }) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3 }}
-        className="flex items-center gap-2 text-emerald-400 text-sm"
+        className="flex items-center gap-2 text-emerald-700 text-sm"
       >
         <CheckCircle className="w-4 h-4" />
         <span>Keine Fehler gefunden! Ausgezeichnet!</span>

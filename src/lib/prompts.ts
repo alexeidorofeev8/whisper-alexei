@@ -29,8 +29,9 @@ Schema:
 }
 
 Regeln:
-- original_tokens: die Eingabe als Array einzelner Wörter (Satzzeichen als eigenes Token)
-- errors[].type: "word_order" für falschen Satzstellung, "case" für falsche Kasusendungen, "wrong_word" für falsches/unnatürliches Wort, "grammar" für andere Grammatikfehler
+- WICHTIG: Markiere die Großschreibung am Satzanfang NIEMALS als Fehler — die Spracherkennung transkribiert automatisch in Kleinbuchstaben. Korrigiere die Großschreibung stillschweigend in "corrected".
+- original_tokens: EXAKT die Wörter aus der Eingabe, unverändert — keine Wortformänderungen, keine Endungsänderungen, keine Rechtschreibkorrekturen, keine Normalisierung. Wenn der Text "Grossen" enthält, muss "Grossen" im Array stehen — niemals "Grosse" oder "Großen". Nur Satzzeichen werden als eigene Tokens aufgespalten.
+- errors[].type: "word_order" für falschen Satzstellung, "case" für falsche Kasusendungen, "wrong_word" für falsches/unnatürliches Wort, "grammar" für andere Grammatikfehler (NICHT Satzanfang-Großschreibung)
 - errors[].original_indices: 0-basierte Positionen der fehlerhaften Token in original_tokens
 - errors[].correct_indices: NUR bei word_order — Zielposition(en) im korrigierten Satz (0-basiert)
 - errors[].correct_word: NUR bei case/wrong_word — das korrekte Wort

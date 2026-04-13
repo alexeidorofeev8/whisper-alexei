@@ -7,12 +7,12 @@ import { cn } from "@/lib/utils";
 
 const ERROR_TOKEN_STYLES: Record<ErrorType, string> = {
   word_order:
-    "bg-blue-500/10 text-blue-300 border border-blue-500/30 hover:bg-blue-500/20",
-  case: "bg-red-500/10 text-red-300 border border-red-500/30 hover:bg-red-500/20",
+    "bg-blue-100 text-blue-700 border border-blue-300 hover:bg-blue-200",
+  case: "bg-red-100 text-red-700 border border-red-300 hover:bg-red-200",
   wrong_word:
-    "bg-amber-500/10 text-amber-300 border border-amber-500/30 hover:bg-amber-500/20",
+    "bg-amber-100 text-amber-700 border border-amber-300 hover:bg-amber-200",
   grammar:
-    "bg-red-500/10 text-red-300 border border-red-500/30 hover:bg-red-500/20",
+    "bg-red-100 text-red-700 border border-red-300 hover:bg-red-200",
 };
 
 const SELECTED_STYLES: Record<ErrorType, string> = {
@@ -65,7 +65,7 @@ export function AnimatedToken({
               "cursor-pointer",
               isSelected ? SELECTED_STYLES[error.type] : ""
             )
-          : "text-zinc-300"
+          : "text-slate-700"
       )}
     >
       {token}

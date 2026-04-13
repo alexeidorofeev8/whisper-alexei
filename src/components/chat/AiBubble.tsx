@@ -10,11 +10,11 @@ export function AiBubble({ message }: { message: Message }) {
       animate={{ opacity: 1, y: 0 }}
       className="flex items-start gap-3 px-4"
     >
-      <div className="w-8 h-8 rounded-full bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 text-xs font-bold shrink-0 mt-0.5">
+      <div className="w-8 h-8 rounded-full bg-teal-50 border border-teal-200 flex items-center justify-center text-teal-700 text-xs font-bold shrink-0 mt-0.5">
         DE
       </div>
-      <div className="max-w-[75%] bg-[#111218] border border-indigo-500/15 rounded-2xl rounded-tl-sm px-4 py-3">
-        <p className="text-zinc-200 text-sm leading-relaxed">{message.aiText}</p>
+      <div className="max-w-[75%] bg-white border border-slate-200 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm">
+        <p className="text-slate-800 text-sm leading-relaxed">{message.aiText}</p>
       </div>
     </motion.div>
   );
