@@ -13,6 +13,12 @@ const ERROR_TOKEN_STYLES: Record<ErrorType, string> = {
     "bg-amber-100 text-amber-700 border border-amber-300 hover:bg-amber-200",
   grammar:
     "bg-red-100 text-red-700 border border-red-300 hover:bg-red-200",
+  article:
+    "bg-orange-100 text-orange-700 border border-orange-300 hover:bg-orange-200",
+  tense:
+    "bg-purple-100 text-purple-700 border border-purple-300 hover:bg-purple-200",
+  preposition:
+    "bg-pink-100 text-pink-700 border border-pink-300 hover:bg-pink-200",
 };
 
 const SELECTED_STYLES: Record<ErrorType, string> = {
@@ -20,6 +26,9 @@ const SELECTED_STYLES: Record<ErrorType, string> = {
   case: "ring-1 ring-red-400",
   wrong_word: "ring-1 ring-amber-400",
   grammar: "ring-1 ring-red-400",
+  article: "ring-1 ring-orange-400",
+  tense: "ring-1 ring-purple-400",
+  preposition: "ring-1 ring-pink-400",
 };
 
 interface AnimatedTokenProps {

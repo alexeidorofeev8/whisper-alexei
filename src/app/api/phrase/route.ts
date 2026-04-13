@@ -1,6 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { getSystemPrompt, buildUserPrompt } from "@/lib/prompts";
-import { AnalysisResult, TargetLanguage } from "@/lib/types";
+import { buildPhrasePrompt } from "@/lib/prompts";
+import { TargetLanguage, TranslationDifficulty, TranslationPhrase } from "@/lib/types";
 import { parseClaudeJson } from "@/lib/utils";
 
 const client = new Anthropic({
@@ -8,30 +8,19 @@ const client = new Anthropic({
 });
 
 export async function POST(req: Request) {
-  const { transcript, targetLanguage = "de" } = await req.json() as {
-    transcript: string;
+  const { difficulty = "medium", targetLanguage = "de" } = await req.json() as {
+    difficulty?: TranslationDifficulty;
     targetLanguage?: TargetLanguage;
   };
-
-  if (!transcript?.trim()) {
-    return Response.json({ error: "No transcript provided" }, { status: 400 });
-  }
 
   try {
     const message = await client.messages.create({
       model: "claude-sonnet-4-6",
-      max_tokens: 2048,
-      system: [
-        {
-          type: "text",
-          text: getSystemPrompt(targetLanguage),
-          cache_control: { type: "ephemeral" },
-        },
-      ],
+      max_tokens: 256,
       messages: [
         {
           role: "user",
-          content: buildUserPrompt(transcript, targetLanguage),
+          content: buildPhrasePrompt(difficulty, targetLanguage),
         },
       ],
     });
@@ -39,9 +28,9 @@ export async function POST(req: Request) {
     const raw =
       message.content[0].type === "text" ? message.content[0].text : "";
 
-    let parsed: AnalysisResult;
+    let parsed: { russian: string };
     try {
-      parsed = parseClaudeJson<AnalysisResult>(raw);
+      parsed = parseClaudeJson<{ russian: string }>(raw);
     } catch {
       console.error("Raw Claude response:", raw);
       return Response.json(
@@ -50,9 +39,16 @@ export async function POST(req: Request) {
       );
     }
 
-    return Response.json(parsed);
+    const phrase: TranslationPhrase = {
+      id: crypto.randomUUID(),
+      russian: parsed.russian,
+      difficulty,
+      targetLanguage,
+    };
+
+    return Response.json(phrase);
   } catch (error) {
     console.error("Claude API error:", error);
-    return Response.json({ error: "Analysis failed" }, { status: 500 });
+    return Response.json({ error: "Phrase generation failed" }, { status: 500 });
   }
 }

@@ -4,18 +4,25 @@ import { motion } from "framer-motion";
 import { GrammarError } from "@/lib/types";
 import { ErrorCard } from "./ErrorCard";
 import { CheckCircle } from "lucide-react";
+import { useAppStore } from "@/store/useAppStore";
 
 export function ErrorList({ errors }: { errors: GrammarError[] }) {
+  const targetLanguage = useAppStore((s) => s.targetLanguage);
+
   if (errors.length === 0) {
+    const label =
+      targetLanguage === "en"
+        ? "No errors found! Excellent!"
+        : "Keine Fehler gefunden! Ausgezeichnet!";
     return (
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3 }}
-        className="flex items-center gap-2 text-emerald-700 text-sm"
+        className="flex items-center gap-2 text-amber-700 text-sm"
       >
         <CheckCircle className="w-4 h-4" />
-        <span>Keine Fehler gefunden! Ausgezeichnet!</span>
+        <span>{label}</span>
       </motion.div>
     );
   }

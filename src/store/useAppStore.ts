@@ -1,12 +1,19 @@
 "use client";
 
 import { create } from "zustand";
-import { Message, RecordingState, AnalysisResult } from "@/lib/types";
+import {
+  Message,
+  RecordingState,
+  TargetLanguage,
+  TranslationDifficulty,
+  TranslationPhrase,
+} from "@/lib/types";
 
 interface AppState {
   messages: Message[];
   addMessage: (msg: Message) => void;
   clearMessages: () => void;
+  clearTranslationHistory: () => void;
 
   recordingState: RecordingState;
   setRecordingState: (s: RecordingState) => void;
@@ -25,12 +32,25 @@ interface AppState {
 
   selectedErrorId: string | null;
   setSelectedErrorId: (id: string | null) => void;
+
+  targetLanguage: TargetLanguage;
+  setTargetLanguage: (lang: TargetLanguage) => void;
+
+  translationMode: boolean;
+  setTranslationMode: (v: boolean) => void;
+
+  translationDifficulty: TranslationDifficulty;
+  setTranslationDifficulty: (d: TranslationDifficulty) => void;
+
+  currentPhrase: TranslationPhrase | null;
+  setCurrentPhrase: (p: TranslationPhrase | null) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
   messages: [],
   addMessage: (msg) => set((s) => ({ messages: [...s.messages, msg] })),
-  clearMessages: () => set({ messages: [] }),
+  clearMessages: () => set({ messages: [], currentPhrase: null }),
+  clearTranslationHistory: () => set({ messages: [] }),
 
   recordingState: "idle",
   setRecordingState: (s) => set({ recordingState: s }),
@@ -49,4 +69,16 @@ export const useAppStore = create<AppState>((set) => ({
 
   selectedErrorId: null,
   setSelectedErrorId: (id) => set({ selectedErrorId: id }),
+
+  targetLanguage: "en",
+  setTargetLanguage: (lang) => set({ targetLanguage: lang }),
+
+  translationMode: true,
+  setTranslationMode: (v) => set({ translationMode: v }),
+
+  translationDifficulty: "easy",
+  setTranslationDifficulty: (d) => set({ translationDifficulty: d }),
+
+  currentPhrase: null,
+  setCurrentPhrase: (p) => set({ currentPhrase: p }),
 }));

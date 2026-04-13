@@ -20,7 +20,7 @@ function WordItem({ item, index }: { item: WordExample; index: number }) {
         onClick={() => setOpen((v) => !v)}
         className="w-full flex items-center justify-between px-3 py-2 hover:bg-slate-50 transition-colors"
       >
-        <span className="text-sm font-mono text-teal-700">{item.word}</span>
+        <span className="text-sm font-mono text-orange-400">{item.word}</span>
         <ChevronDown
           className={cn(
             "w-4 h-4 text-slate-400 transition-transform",

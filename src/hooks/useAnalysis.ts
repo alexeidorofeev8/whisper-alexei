@@ -4,11 +4,11 @@ import { useAppStore } from "@/store/useAppStore";
 import { AnalysisResult } from "@/lib/types";
 
 export function useAnalysis() {
-  const { addMessage, setIsAnalyzing, incrementErrors, setSessionLevel } =
+  const { addMessage, setIsAnalyzing, incrementErrors, setSessionLevel, targetLanguage } =
     useAppStore();
 
   const analyze = async (rawTranscript: string) => {
-    // Speech API пишет строчными — капитализируем первую букву
+    // Speech API transcribes in lowercase — capitalise the first letter
     const transcript =
       rawTranscript.charAt(0).toUpperCase() + rawTranscript.slice(1);
 
@@ -25,7 +25,7 @@ export function useAnalysis() {
       const res = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ transcript }),
+        body: JSON.stringify({ transcript, targetLanguage }),
       });
 
       if (!res.ok) throw new Error("Analysis failed");
@@ -51,11 +51,15 @@ export function useAnalysis() {
       setSessionLevel(result.level_assessment);
     } catch (err) {
       console.error(err);
+      const errorMsg =
+        targetLanguage === "en"
+          ? "Sorry, there was a technical error. Please try again."
+          : "Es tut mir leid, es gab einen technischen Fehler. Bitte versuche es noch einmal.";
       addMessage({
         id: crypto.randomUUID(),
         role: "ai",
         timestamp: Date.now(),
-        aiText: "Es tut mir leid, es gab einen technischen Fehler. Bitte versuche es noch einmal.",
+        aiText: errorMsg,
       });
     } finally {
       setIsAnalyzing(false);

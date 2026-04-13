@@ -8,7 +8,7 @@ const LEVEL_COLORS: Record<string, string> = {
   B1: "bg-blue-50 text-blue-700 border border-blue-200",
   B2: "bg-indigo-50 text-indigo-700 border border-indigo-200",
   C1: "bg-violet-50 text-violet-700 border border-violet-200",
-  C2: "bg-teal-50 text-teal-700 border border-teal-200",
+  C2: "bg-orange-50 text-orange-700 border border-orange-200",
 };
 
 export function StudyTip({ tip, level }: { tip: string; level: string }) {

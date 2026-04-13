@@ -6,8 +6,10 @@ import { useState } from "react";
 
 function AlternativeItem({ text, index }: { text: string; index: number }) {
   const [copied, setCopied] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
-  const handleCopy = async () => {
+  const handleCopy = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     await navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
@@ -18,19 +20,20 @@ function AlternativeItem({ text, index }: { text: string; index: number }) {
       initial={{ opacity: 0, y: 4 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.45 + index * 0.06 }}
-      className="group flex items-center justify-between gap-3 px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg hover:border-slate-300 transition-colors"
+      onClick={() => setExpanded((v) => !v)}
+      className="group flex items-start justify-between gap-3 px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg hover:border-slate-300 transition-colors cursor-pointer"
     >
-      <div className="flex items-center gap-2 min-w-0">
-        <span className="text-xs text-slate-400 font-mono shrink-0">{index + 1}.</span>
-        <p className="text-sm text-slate-700 truncate">{text}</p>
+      <div className="flex items-start gap-2 min-w-0">
+        <span className="text-xs text-slate-400 font-mono shrink-0 mt-0.5">{index + 1}.</span>
+        <p className={`text-sm text-slate-700 ${expanded ? "" : "truncate"}`}>{text}</p>
       </div>
       <button
         onClick={handleCopy}
-        className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-slate-600 shrink-0"
+        className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-slate-600 shrink-0 mt-0.5"
         aria-label="Kopieren"
       >
         {copied ? (
-          <Check className="w-3.5 h-3.5 text-emerald-600" />
+          <Check className="w-3.5 h-3.5 text-orange-500" />
         ) : (
           <Copy className="w-3.5 h-3.5" />
         )}

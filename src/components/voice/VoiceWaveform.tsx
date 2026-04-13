@@ -10,7 +10,7 @@ export function VoiceWaveform({ active }: { active: boolean }) {
       {BARS.map((phase, i) => (
         <motion.div
           key={i}
-          className="w-[3px] rounded-full bg-teal-500"
+          className="w-[3px] rounded-full bg-orange-400"
           animate={
             active
               ? { scaleY: [0.3, phase, 0.3], opacity: [0.6, 1, 0.6] }

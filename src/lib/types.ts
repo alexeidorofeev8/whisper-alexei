@@ -1,4 +1,11 @@
-export type ErrorType = "word_order" | "case" | "wrong_word" | "grammar";
+export type ErrorType =
+  | "word_order"
+  | "case"
+  | "wrong_word"
+  | "grammar"
+  | "article"
+  | "tense"
+  | "preposition";
 
 export interface GrammarError {
   id: string;
@@ -27,7 +34,25 @@ export interface AnalysisResult {
   study_tip: string;
 }
 
-export type MessageRole = "user" | "analysis" | "ai";
+export type TargetLanguage = "de" | "en";
+export type TranslationDifficulty = "easy" | "medium" | "hard";
+
+export interface TranslationPhrase {
+  id: string;
+  russian: string;
+  difficulty: TranslationDifficulty;
+  targetLanguage: TargetLanguage;
+}
+
+export interface TranslationResult {
+  correct: boolean;
+  corrected_translation: string;
+  explanation_ru: string;
+  score: "perfect" | "good" | "needs_work";
+  errors: GrammarError[];
+}
+
+export type MessageRole = "user" | "analysis" | "ai" | "translation" | "phrase";
 
 export interface Message {
   id: string;
@@ -36,6 +61,8 @@ export interface Message {
   transcript?: string;
   analysis?: AnalysisResult;
   aiText?: string;
+  translationResult?: TranslationResult;
+  phrase?: TranslationPhrase;
 }
 
 export type RecordingState = "idle" | "recording" | "processing" | "error";

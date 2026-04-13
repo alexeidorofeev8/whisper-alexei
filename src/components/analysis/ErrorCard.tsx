@@ -10,33 +10,54 @@ const ERROR_STYLES: Record<GrammarError["type"], { border: string; bg: string; b
     border: "border-l-blue-400",
     bg: "bg-blue-50",
     badge: "bg-blue-100 text-blue-700 border border-blue-200",
-    label: "Wortstellung",
+    label: "Word Order",
   },
   case: {
     border: "border-l-red-400",
     bg: "bg-red-50",
     badge: "bg-red-100 text-red-700 border border-red-200",
-    label: "Kasus",
+    label: "Case",
   },
   wrong_word: {
     border: "border-l-amber-400",
     bg: "bg-amber-50",
     badge: "bg-amber-100 text-amber-700 border border-amber-200",
-    label: "Wortwahl",
+    label: "Word Choice",
   },
   grammar: {
     border: "border-l-red-400",
     bg: "bg-red-50",
     badge: "bg-red-100 text-red-700 border border-red-200",
-    label: "Grammatik",
+    label: "Grammar",
+  },
+  article: {
+    border: "border-l-orange-400",
+    bg: "bg-orange-50",
+    badge: "bg-orange-100 text-orange-700 border border-orange-200",
+    label: "Article",
+  },
+  tense: {
+    border: "border-l-purple-400",
+    bg: "bg-purple-50",
+    badge: "bg-purple-100 text-purple-700 border border-purple-200",
+    label: "Tense",
+  },
+  preposition: {
+    border: "border-l-pink-400",
+    bg: "bg-pink-50",
+    badge: "bg-pink-100 text-pink-700 border border-pink-200",
+    label: "Preposition",
   },
 };
 
 export function ErrorCard({ error, index }: { error: GrammarError; index: number }) {
   const selectedErrorId = useAppStore((s) => s.selectedErrorId);
   const setSelectedErrorId = useAppStore((s) => s.setSelectedErrorId);
+  const targetLanguage = useAppStore((s) => s.targetLanguage);
   const styles = ERROR_STYLES[error.type];
   const isSelected = selectedErrorId === error.id;
+
+  const correctLabel = targetLanguage === "en" ? "Correct:" : "Korrekt:";
 
   return (
     <motion.div
@@ -62,8 +83,8 @@ export function ErrorCard({ error, index }: { error: GrammarError; index: number
 
       {error.correct_word && (
         <p className="mt-1.5 text-xs text-slate-500">
-          Korrekt:{" "}
-          <span className="font-mono font-semibold text-teal-700">
+          {correctLabel}{" "}
+          <span className="font-mono font-semibold text-orange-400">
             {error.correct_word}
           </span>
         </p>

@@ -16,8 +16,8 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "DeutschTrainer — Lerne Deutsch mit KI",
-  description: "Sprich Deutsch und erhalte sofortiges Grammatik-Feedback auf B1–C2 Niveau",
+  title: "LinguaFlow — Learn Languages with AI",
+  description: "Practice speaking German or English and get instant grammar feedback powered by AI",
 };
 
 export default function RootLayout({
@@ -27,7 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="de"
+      lang="en"
       className={`${inter.variable} ${jetbrainsMono.variable} h-full`}
     >
       <body className="h-full">

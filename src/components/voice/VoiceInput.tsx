@@ -2,26 +2,31 @@
 
 import { useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mic, MicOff, Loader2 } from "lucide-react";
+import { Mic, Square, Loader2 } from "lucide-react";
 import { useAppStore } from "@/store/useAppStore";
 import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
-import { useAnalysis } from "@/hooks/useAnalysis";
 import { VoiceWaveform } from "./VoiceWaveform";
 import { TranscriptPreview } from "./TranscriptPreview";
 
-export function VoiceInput() {
+interface VoiceInputProps {
+  onFinal: (transcript: string) => void;
+}
+
+export function VoiceInput({ onFinal }: VoiceInputProps) {
   const recordingState = useAppStore((s) => s.recordingState);
   const isAnalyzing = useAppStore((s) => s.isAnalyzing);
-  const { analyze } = useAnalysis();
+  const targetLanguage = useAppStore((s) => s.targetLanguage);
+
+  const speechLang = targetLanguage === "en" ? "en-US" : "de-DE";
 
   const handleFinal = useCallback(
     (transcript: string) => {
-      if (transcript) analyze(transcript);
+      if (transcript) onFinal(transcript);
     },
-    [analyze]
+    [onFinal]
   );
 
-  const { start, stop, isSupported } = useSpeechRecognition(handleFinal);
+  const { start, stop, isSupported } = useSpeechRecognition(handleFinal, speechLang);
 
   const isRecording = recordingState === "recording";
   const isError = recordingState === "error";
@@ -31,6 +36,33 @@ export function VoiceInput() {
     if (isRecording) stop();
     else if (!isDisabled) start();
   };
+
+  const labels =
+    targetLanguage === "en"
+      ? {
+          notSupported: "Web Speech API not supported — use Chrome",
+          analyzing: "Analysing…",
+          recording: "Speak — click to stop",
+          error: "Error — please try again",
+          idle: "Click and speak in English",
+        }
+      : {
+          notSupported: "Web Speech API nicht unterstützt — nutze Chrome",
+          analyzing: "Analysiere…",
+          recording: "Sprich — klicke zum Stoppen",
+          error: "Fehler — bitte erneut versuchen",
+          idle: "Klicke und sprich auf Deutsch",
+        };
+
+  const statusText = !isSupported
+    ? labels.notSupported
+    : isAnalyzing
+    ? labels.analyzing
+    : isRecording
+    ? labels.recording
+    : isError
+    ? labels.error
+    : labels.idle;
 
   return (
     <div className="flex flex-col items-center gap-3 py-4">
@@ -49,10 +81,10 @@ export function VoiceInput() {
               ? "bg-red-50 border-2 border-red-300 text-red-400"
               : isDisabled
               ? "bg-slate-100 border-2 border-slate-200 text-slate-400 cursor-not-allowed"
-              : "bg-teal-50 border-2 border-teal-300 text-teal-600 hover:bg-teal-100 hover:border-teal-400"
+              : "bg-amber-50 border-2 border-amber-200 text-amber-500 hover:bg-amber-100 hover:border-amber-300"
             }
           `}
-          aria-label={isRecording ? "Aufnahme stoppen" : "Aufnahme starten"}
+          aria-label={isRecording ? labels.recording : labels.idle}
         >
           {isRecording && (
             <motion.span
@@ -64,7 +96,7 @@ export function VoiceInput() {
           {isAnalyzing ? (
             <Loader2 className="w-6 h-6 animate-spin" />
           ) : isRecording ? (
-            <MicOff className="w-6 h-6" />
+            <Square className="w-5 h-5 fill-current" />
           ) : (
             <Mic className="w-6 h-6" />
           )}
@@ -83,17 +115,7 @@ export function VoiceInput() {
         </AnimatePresence>
       </div>
 
-      <p className="text-xs text-slate-400">
-        {!isSupported
-          ? "Web Speech API nicht unterstützt — nutze Chrome"
-          : isAnalyzing
-          ? "Analysiere..."
-          : isRecording
-          ? "Sprich — klicke zum Stoppen"
-          : isError
-          ? "Fehler — bitte erneut versuchen"
-          : "Klicke und sprich auf Deutsch"}
-      </p>
+      <p className="text-xs text-slate-400">{statusText}</p>
     </div>
   );
 }

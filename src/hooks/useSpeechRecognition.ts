@@ -35,7 +35,10 @@ declare global {
   }
 }
 
-export function useSpeechRecognition(onFinal: (transcript: string) => void) {
+export function useSpeechRecognition(
+  onFinal: (transcript: string) => void,
+  lang: string = "de-DE"
+) {
   const recognitionRef = useRef<ISpeechRecognition | null>(null);
   const accumulatedRef = useRef(""); // накапливаем все финальные фрагменты
   const { setRecordingState, setInterimTranscript, setFinalTranscript } =
@@ -57,7 +60,7 @@ export function useSpeechRecognition(onFinal: (transcript: string) => void) {
     accumulatedRef.current = "";
 
     const recognition = new SR();
-    recognition.lang = "de-DE";
+    recognition.lang = lang;
     recognition.interimResults = true;
     recognition.continuous = true;   // не останавливаться на паузах
     recognition.maxAlternatives = 1;

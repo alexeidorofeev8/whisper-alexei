@@ -10,8 +10,8 @@ export function UserBubble({ message }: { message: Message }) {
       animate={{ opacity: 1, y: 0 }}
       className="flex justify-end px-4"
     >
-      <div className="max-w-[75%] bg-teal-600 rounded-2xl rounded-tr-sm px-4 py-3 shadow-sm">
-        <p className="text-white text-sm leading-relaxed">
+      <div className="max-w-[75%] bg-orange-100 rounded-2xl rounded-tr-sm px-4 py-3 shadow-sm">
+        <p className="text-orange-900 text-sm leading-relaxed">
           {message.transcript}
         </p>
       </div>
