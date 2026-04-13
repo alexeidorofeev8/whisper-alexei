@@ -16,6 +16,7 @@ export interface GrammarError {
   correct_word?: string;
   explanation: string;
   rule_name: string;
+  examples?: string[];
 }
 
 export interface WordExample {
@@ -47,6 +48,7 @@ export interface TranslationPhrase {
 export interface TranslationResult {
   correct: boolean;
   corrected_translation: string;
+  colloquial?: string;
   explanation_ru: string;
   score: "perfect" | "good" | "needs_work";
   errors: GrammarError[];

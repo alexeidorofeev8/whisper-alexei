@@ -1,8 +1,6 @@
 "use client";
 
 import { useAppStore } from "@/store/useAppStore";
-import { SessionStats } from "./SessionStats";
-import { Trash2 } from "lucide-react";
 import { TargetLanguage } from "@/lib/types";
 
 function LanguageSwitcher() {
@@ -75,16 +73,14 @@ function ModeTabs() {
 }
 
 export function AppHeader() {
-  const clearMessages = useAppStore((s) => s.clearMessages);
-
   return (
-    <header className="sticky top-0 z-10 flex items-center justify-between px-4 h-14 border-b border-slate-200 bg-white/80 backdrop-blur-xl gap-3">
+    <header className="sticky top-0 z-10 flex items-center justify-between px-3 sm:px-4 h-14 border-b border-slate-200 bg-white/80 backdrop-blur-xl gap-2 sm:gap-3">
       {/* Logo */}
-      <div className="flex items-center gap-2.5 shrink-0">
-        <div className="w-7 h-7 rounded-lg bg-orange-50 border border-orange-200 flex items-center justify-center text-orange-500 text-xs font-bold">
+      <div className="flex items-center gap-2 shrink-0">
+        <div className="w-7 h-7 rounded-lg bg-orange-50 border border-orange-200 flex items-center justify-center text-orange-500 text-xs font-bold shrink-0">
           L
         </div>
-        <h1 className="text-sm font-semibold text-slate-900">
+        <h1 className="text-sm font-semibold text-slate-900 hidden min-[360px]:block">
           Lingua<span className="text-orange-400">Flow</span>
         </h1>
       </div>
@@ -94,16 +90,7 @@ export function AppHeader() {
 
       {/* Right controls */}
       <div className="flex items-center gap-2 shrink-0">
-        <SessionStats />
         <LanguageSwitcher />
-        <button
-          onClick={clearMessages}
-          className="text-slate-400 hover:text-slate-600 transition-colors p-1.5 rounded-lg hover:bg-slate-100"
-          aria-label="Clear conversation"
-          title="Clear conversation"
-        >
-          <Trash2 className="w-4 h-4" />
-        </button>
       </div>
     </header>
   );

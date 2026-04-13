@@ -44,6 +44,9 @@ interface AppState {
 
   currentPhrase: TranslationPhrase | null;
   setCurrentPhrase: (p: TranslationPhrase | null) => void;
+
+  usedPhrases: string[];
+  addUsedPhrase: (phrase: string) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -81,4 +84,8 @@ export const useAppStore = create<AppState>((set) => ({
 
   currentPhrase: null,
   setCurrentPhrase: (p) => set({ currentPhrase: p }),
+
+  usedPhrases: [],
+  addUsedPhrase: (phrase) =>
+    set((s) => ({ usedPhrases: [...s.usedPhrases.slice(-9), phrase] })),
 }));

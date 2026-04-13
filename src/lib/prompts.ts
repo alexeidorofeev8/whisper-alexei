@@ -37,7 +37,7 @@ Regeln:
 - errors[].original_indices: 0-basierte Positionen der fehlerhaften Token in original_tokens
 - errors[].correct_indices: NUR bei word_order — Zielposition(en) im korrigierten Satz (0-basiert)
 - errors[].correct_word: NUR bei case/wrong_word — das korrekte Wort
-- errors[].explanation: präzise grammatikalische Erklärung auf Deutsch (1-2 Sätze)
+- errors[].explanation: präzise grammatikalische Erklärung auf Russisch (1-2 Sätze)
 - errors[].rule_name: kurzes Regelname, z.B. "Wechselpräpositionen", "Verb-Endstellung", "Akkusativ nach 'durch'"
 - Bei keinen Fehlern: "errors": []
 - alternatives: 2-3 natürliche deutsche Formulierungen (einschließlich der korrigierten Version)
@@ -83,7 +83,7 @@ Rules:
 - errors[].original_indices: 0-based positions of the erroneous tokens in original_tokens
 - errors[].correct_indices: ONLY for word_order — target position(s) in the corrected sentence (0-based)
 - errors[].correct_word: ONLY for article/tense/preposition/wrong_word — the correct word or phrase
-- errors[].explanation: precise grammatical explanation in English (1-2 sentences)
+- errors[].explanation: precise grammatical explanation in Russian (1-2 sentences)
 - errors[].rule_name: short rule name, e.g. "Definite article with known nouns", "Past simple vs. present perfect", "Preposition 'at' for locations"
 - If no errors: "errors": []
 - alternatives: 2-3 natural English phrasings (including the corrected version)
@@ -113,31 +113,41 @@ export function buildUserPrompt(
 
 export function buildPhrasePrompt(
   difficulty: TranslationDifficulty,
-  targetLanguage: TargetLanguage
+  targetLanguage: TargetLanguage,
+  seed?: number,
+  topic?: string,
+  usedPhrases?: string[]
 ): string {
   const langName = targetLanguage === "de" ? "German" : "English";
 
   const guidelines: Record<TranslationDifficulty, string> = {
     easy:
-      "Simple present tense only. 4-7 words. Common everyday vocabulary. Example topics: greetings, food, weather, time.",
+      "Simple present tense only. 4-7 words. Common everyday vocabulary.",
     medium:
-      "Mix of present, past (perfekt/simple past) and future. May include a subordinate clause. 8-14 words. Topics: travel, work, hobbies, plans.",
+      "Mix of present, past and future. May include a subordinate clause. 8-14 words.",
     hard:
-      "Subjunctive mood, conditionals, idiomatic expressions, complex sentence structure. 12-20 words. Topics: opinions, hypotheticals, abstract ideas.",
+      "Subjunctive mood, conditionals, idiomatic expressions, complex sentence structure. 12-20 words.",
   };
 
-  return `You are generating Russian phrases for language learners who want to practise translating into ${langName}.
+  const topicLine = topic ? `\nTopic to use: "${topic}"` : "";
+  const seedLine = seed !== undefined ? `\n(token: ${seed.toString(36).slice(2, 8)})` : "";
 
-Generate exactly ONE Russian phrase suitable for translation into ${langName}.
+  const avoidSection =
+    usedPhrases && usedPhrases.length > 0
+      ? `\n\nDo NOT generate any of these phrases or close variations of them:\n${usedPhrases.map((p) => `- ${p}`).join("\n")}`
+      : "";
 
-Difficulty: ${difficulty}
-Guidelines: ${guidelines[difficulty]}
+  return `You are generating Russian phrases for language learners practising translation into ${langName}.
 
-The phrase should:
-- Be natural, everyday Russian (not textbook Russian)
-- Be something a real person might say
-- Have a clear, unambiguous translation into ${langName}
+Generate exactly ONE Russian phrase.${topicLine}
+Difficulty: ${difficulty} — ${guidelines[difficulty]}
 
+Rules:
+- Natural, everyday Russian (not textbook)
+- Something a real person would actually say
+- Clear unambiguous translation into ${langName}
+- MUST be different in topic, structure, and vocabulary from avoided phrases below${avoidSection}
+${seedLine}
 Reply with a single valid JSON object and nothing else:
 { "russian": "..." }`;
 }
@@ -164,11 +174,13 @@ Your task:
 5. Assign a score
 
 IMPORTANT: Speech recognition transcribes in lowercase — never mark sentence-start capitalisation as an error. Fix it silently in corrected_translation.
+IMPORTANT: errors[].explanation must always be written in Russian (the learner's native language).
 
 Reply with a single valid JSON object and nothing else:
 {
   "correct": boolean,
   "corrected_translation": "best ${langName} translation here",
+  "colloquial": "optional — how a native speaker would actually say this casually, OR one interesting idiom/jargon/cultural note. Omit if nothing genuinely interesting.",
   "explanation_ru": "объяснение ошибок на русском языке (1-3 предложения)",
   "score": "perfect" | "good" | "needs_work",
   "errors": Array<{
@@ -179,7 +191,8 @@ Reply with a single valid JSON object and nothing else:
     "correct_indices": number[],
     "correct_word": string,
     "explanation": string,
-    "rule_name": string
+    "rule_name": string,
+    "examples": ["optional — 1-2 short sentences (under 10 words each) showing this rule correctly in a different context. Omit if not useful."]
   }>
 }
 
@@ -187,6 +200,10 @@ Score guide:
 - "perfect": translation is accurate and natural, no meaningful errors
 - "good": translation conveys the meaning but has 1-2 minor issues
 - "needs_work": translation is inaccurate, unnatural, or has significant errors
+
+Field rules:
+- colloquial: only include when genuinely interesting — a casual shortening, a common idiom, slang, or a native-speaker nuance. Do NOT invent padding.
+- examples: only include when a short example helps cement the rule. Max 2, keep each under 10 words.
 
 If the translation is empty or completely unrelated, set correct=false, score="needs_work", and explain kindly in explanation_ru.`;
 }

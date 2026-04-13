@@ -39,13 +39,13 @@ export function TranslationInterface() {
     <div className="flex-1 overflow-y-auto py-6 flex flex-col gap-5 px-4">
 
       {/* Top row: difficulty pills + next-phrase button */}
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-1.5">
           {DIFFICULTIES.map((d) => (
             <button
               key={d.value}
               onClick={() => setTranslationDifficulty(d.value)}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors border ${
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors border ${
                 translationDifficulty === d.value
                   ? "bg-orange-100 text-orange-600 border-orange-200"
                   : "bg-white text-slate-600 border-slate-200 hover:border-slate-300 hover:bg-slate-50"
@@ -56,9 +56,9 @@ export function TranslationInterface() {
           ))}
         </div>
 
-        {/* Next phrase — visible once a phrase exists */}
+        {/* Next phrase — visible when phrase exists but no result yet */}
         <AnimatePresence>
-          {currentPhrase && (
+          {currentPhrase && !hasResult && (
             <motion.button
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -128,9 +128,37 @@ export function TranslationInterface() {
 
       <div ref={bottomRef} />
 
-      {/* Sticky mic */}
+      {/* Sticky bottom — mic while waiting, next-phrase button after result */}
       <div className="border-t border-slate-200 bg-white/90 backdrop-blur-xl -mx-4 px-4 mt-auto sticky bottom-0">
-        <VoiceInput onFinal={evaluate} />
+        <AnimatePresence mode="wait">
+          {hasResult ? (
+            <motion.div
+              key="next"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 8 }}
+              className="flex justify-center py-5"
+            >
+              <button
+                onClick={fetchPhrase}
+                disabled={isAnalyzing}
+                className="flex items-center gap-2 px-8 py-3 rounded-full bg-orange-100 text-orange-600 text-sm font-semibold hover:bg-orange-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+              >
+                <RefreshCw className={`w-4 h-4 ${isAnalyzing ? "animate-spin" : ""}`} />
+                Следующая фраза
+              </button>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="mic"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <VoiceInput onFinal={evaluate} />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

@@ -13,21 +13,31 @@ export function useTranslation() {
     translationDifficulty,
     targetLanguage,
     incrementErrors,
+    usedPhrases,
+    addUsedPhrase,
   } = useAppStore();
 
   const fetchPhrase = async () => {
     clearTranslationHistory();
+    setCurrentPhrase(null);
     setIsAnalyzing(true);
     try {
       const res = await fetch("/api/phrase", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ difficulty: translationDifficulty, targetLanguage }),
+        cache: "no-store",
+        body: JSON.stringify({
+          difficulty: translationDifficulty,
+          targetLanguage,
+          seed: Math.random(),
+          usedPhrases: usedPhrases.slice(-5),
+        }),
       });
 
       if (!res.ok) throw new Error("Phrase generation failed");
       const phrase: TranslationPhrase = await res.json();
       setCurrentPhrase(phrase);
+      addUsedPhrase(phrase.russian);
     } catch (err) {
       console.error(err);
     } finally {

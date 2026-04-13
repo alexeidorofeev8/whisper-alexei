@@ -9,14 +9,17 @@ export function TranscriptPreview() {
   return (
     <AnimatePresence>
       {interimTranscript && (
-        <motion.p
-          initial={{ opacity: 0, y: 4 }}
+        <motion.div
+          initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -4 }}
-          className="text-sm text-slate-500 italic text-center px-4 max-w-md truncate"
+          exit={{ opacity: 0, transition: { duration: 0.15 } }}
+          className="w-full rounded-xl bg-slate-50 border border-slate-200 px-4 py-3"
         >
-          {interimTranscript}
-        </motion.p>
+          <p className="text-sm text-slate-700 leading-relaxed break-words">
+            {interimTranscript}
+            <span className="inline-block w-[2px] h-[0.85em] bg-orange-400 ml-[3px] align-text-bottom rounded-sm animate-pulse" />
+          </p>
+        </motion.div>
       )}
     </AnimatePresence>
   );

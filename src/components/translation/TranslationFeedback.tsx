@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { CheckCircle, AlertCircle, XCircle } from "lucide-react";
+import { CheckCircle, AlertCircle, XCircle, Sparkles } from "lucide-react";
 import { TranslationResult } from "@/lib/types";
 import { CorrectedPhrase } from "@/components/analysis/CorrectedPhrase";
 import { ErrorList } from "@/components/analysis/ErrorList";
@@ -51,6 +51,14 @@ export function TranslationFeedback({ result }: TranslationFeedbackProps) {
       {/* Corrected translation */}
       <CorrectedPhrase corrected={result.corrected_translation} />
 
+      {/* Native speaker note */}
+      {result.colloquial && (
+        <div className="border-l-2 border-orange-200 pl-3 flex items-start gap-1.5">
+          <Sparkles className="w-3.5 h-3.5 text-orange-300 shrink-0 mt-0.5" />
+          <p className="text-sm text-slate-500 italic leading-snug">{result.colloquial}</p>
+        </div>
+      )}
+
       {/* Russian explanation */}
       {result.explanation_ru && (
         <p className="text-sm text-slate-600 leading-relaxed px-1">
@@ -58,16 +66,11 @@ export function TranslationFeedback({ result }: TranslationFeedbackProps) {
         </p>
       )}
 
-      {/* Error breakdown */}
+      {/* Error breakdown — no count heading */}
       {result.errors.length > 0 && (
         <>
           <Separator className="bg-slate-100" />
-          <div>
-            <p className="text-xs text-slate-400 uppercase tracking-wide font-medium mb-2">
-              Ошибки ({result.errors.length})
-            </p>
-            <ErrorList errors={result.errors} />
-          </div>
+          <ErrorList errors={result.errors} />
         </>
       )}
     </motion.div>

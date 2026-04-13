@@ -65,8 +65,9 @@ export function VoiceInput({ onFinal }: VoiceInputProps) {
     : labels.idle;
 
   return (
-    <div className="flex flex-col items-center gap-3 py-4">
+    <div className="flex flex-col gap-3 py-4">
       <TranscriptPreview />
+      <div className="flex flex-col items-center gap-2">
       <div className="flex items-center gap-4">
         <motion.button
           onClick={handleClick}
@@ -115,7 +116,8 @@ export function VoiceInput({ onFinal }: VoiceInputProps) {
         </AnimatePresence>
       </div>
 
+      </div>
       <p className="text-xs text-slate-400">{statusText}</p>
-    </div>
+      </div>
   );
 }

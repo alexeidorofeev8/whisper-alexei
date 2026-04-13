@@ -89,6 +89,17 @@ export function ErrorCard({ error, index }: { error: GrammarError; index: number
           </span>
         </p>
       )}
+
+      {error.examples && error.examples.length > 0 && (
+        <ul className="mt-2 flex flex-col gap-0.5">
+          {error.examples.map((ex, i) => (
+            <li key={i} className="text-xs text-slate-400 flex gap-1">
+              <span className="shrink-0 text-slate-300">›</span>
+              <span>{ex}</span>
+            </li>
+          ))}
+        </ul>
+      )}
     </motion.div>
   );
 }
