@@ -24,6 +24,11 @@ export interface WordExample {
   examples: string[];
 }
 
+export interface AlignedPair {
+  left: string;  // original phrase fragment
+  right: string; // corrected fragment
+}
+
 export interface AnalysisResult {
   original_tokens: string[];
   corrected: string;
@@ -33,6 +38,8 @@ export interface AnalysisResult {
   ai_response: string;
   level_assessment: string;
   study_tip: string;
+  /** Side-by-side phrase pairs splitting the original and corrected into ~3-7 short fragments. */
+  aligned?: AlignedPair[];
 }
 
 export type TargetLanguage = "de" | "en";
@@ -98,6 +105,21 @@ export interface DialogReplyRequest {
 export interface DialogReplyResult {
   analysis: AnalysisResult;
   reply: string;
+}
+
+export interface FehlerberichtRequest {
+  rules: string[]; // top rule_names (with markdown)
+}
+
+export interface FehlerberichtItem {
+  title: string;        // short German label, may include **bold**
+  explanation: string;  // 1-2 sentences, German, with **bold**
+  examples: string[];   // 2-3 short example sentences
+  tip: string;          // one practical mnemonic / rule of thumb, German
+}
+
+export interface FehlerberichtResult {
+  items: FehlerberichtItem[];
 }
 
 export interface CorrectionRequest {

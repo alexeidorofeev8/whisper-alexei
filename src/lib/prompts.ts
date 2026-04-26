@@ -248,7 +248,7 @@ const DIFFICULTY_HINTS_DE: Record<Difficulty, string> = {
   easy:
     "Einfache Alltagssituation. Gesprächspartner spricht in kurzen, klaren Sätzen (B1). Vokabular: Alltag, Familie, Einkauf, Arbeit auf einfacher Ebene.",
   medium:
-    "Mittelschwere Situation mit Konjunktiv, Nebensätzen, Modalverben. B2-Niveau. Gesprächspartner kann beiläufig idiomatische Wendungen verwenden.",
+    "Fordernde Alltagssituation auf B2-C1-Niveau: Konjunktiv, Nebensätze, Modalverben, idiomatische Wendungen, gelegentlich auch ein Fachbegriff. Nicht trivial, aber auch nicht extrem behördlich.",
   hard:
     "Anspruchsvolle Situation: Beamtensprache, Fachjargon, indirekte Rede, Konjunktiv II, längere Satzgefüge. C1-Niveau.",
 };
@@ -332,18 +332,31 @@ Bei jedem Lerner-Turn machst du ZWEI Dinge in einem JSON-Objekt:
   "word_examples": Array<{ "word": string, "examples": string[] }>,
   "ai_response": string,
   "level_assessment": "A2" | "B1" | "B2" | "C1" | "C2",
-  "study_tip": string
+  "study_tip": string,
+  "aligned": Array<{ "left": string, "right": string }>
 }
 
 Regeln für analysis:
 - Markiere die Großschreibung am Satzanfang NIEMALS als Fehler (Spracherkennung schreibt klein). Korrigiere stillschweigend in "corrected".
 - original_tokens: EXAKT die Wörter aus der Eingabe, unverändert.
-- errors[].rule_name: kurzer deutscher Hinweis, MAXIMAL 12 Wörter, AUSSCHLIESSLICH auf Deutsch. Hebe Schlüsselwörter mit Markdown-Fettschrift hervor (Doppelsternchen): **Akkusativ**, **Verb**, **Trennbare Verben**. WICHTIG: Verwende NIEMALS doppelte Anführungszeichen (") innerhalb des Strings, das zerstört das JSON. Wenn du ein deutsches Wort zitieren willst, schreibe es einfach in **Fettschrift**, ohne Anführungszeichen drumrum. Beispiele für korrekte rule_name-Werte: **Akkusativ** statt **Dativ** nach **durch**  ·  **Verb** am Satzende im Nebensatz  ·  **Trennbare Verben**: Vorsilbe ans Satzende.
-- errors[].explanation: kurze grammatikalische Erklärung auf Deutsch (max. 1 Satz). Gleiche Regel: keine doppelten Anführungszeichen, nutze **Fettschrift**.
+- errors[]: PRIORISIERE Wortwahl-Fehler (type=wrong_word) und Idiom-Fehler über reine Grammatikfehler. Maximal 2-3 Fehler insgesamt — die WICHTIGSTEN.
+- errors[].rule_name: kurze deutsche Kategorie für Statistik (max. 6 Wörter), z.B. **Wortwahl**, **Akkusativ nach durch**, **Trennbare Verben**, **Verb-Endstellung**. Mit **Fettschrift** auf Schlüsselwort. KEINE doppelten Anführungszeichen.
+- errors[].explanation: das WICHTIGSTE Feld — wird dem Lerner gezeigt. Auf Deutsch, max. 25 Wörter.
+   * Bei type=wrong_word ODER Idiom: erkläre die BEDEUTUNG der Wörter und wann man welches nutzt. Beispiel: "**Anzeige** = offizielle Meldung bei Polizei oder Behörde. **Abmahnung** = formelle Warnung vom Vermieter mit rechtlicher Folge, hier passt das."
+   * Bei type=case/article/preposition: kurze strukturelle Erklärung mit Beispielwort. Beispiel: "Nach **durch** kommt immer **Akkusativ** — also **den** Park, nicht **dem** Park."
+   * Bei type=word_order/tense/grammar: kurze Regel mit Beispiel. Beispiel: "**Verb** auf Position 2 im Hauptsatz: **Heute** gehe ich, nicht ich gehe heute."
+   * IMMER mit **Fettschrift** auf Schlüsselwörtern. KEINE doppelten Anführungszeichen.
 - Bei keinen Fehlern: "errors": [].
 - alternatives, word_examples: leer lassen ([]).
 - ai_response: leerer String — wir nutzen das Feld nicht.
 - level_assessment und study_tip: ein einzelnes kurzes Wort/Satz reicht (z.B. "B2", "weiter so").
+- aligned: PFLICHT-Feld. Teile den Originaltext UND die korrigierte Version in dieselbe Anzahl kurzer Phrasen-Paare auf (3 bis 7 Paare). Jede Phrase 2-6 Wörter. Aufteilung an natürlichen Phrasengrenzen: Zeitangabe / Subjekt / Verb-Phrase / Objekt / Nebensatz / Adverbiale. WICHTIG: links = exakt das was der Lerner geschrieben hat (mit Fehlern), rechts = wie es richtig sein sollte. Auch wenn die Phrase identisch ist, behalte sie im Paar bei. Verwende KEINE doppelten Anführungszeichen innerhalb der Strings. Wenn der Satz komplett korrekt ist: aligned leer lassen ([]).
+  Beispiel — Original: "ich bin sorry aber gestern haben wir party gemacht", Korrigiert: "Ich entschuldige mich, aber gestern haben wir eine Party gefeiert":
+  [
+    { "left": "ich bin sorry", "right": "Ich entschuldige mich" },
+    { "left": "aber gestern", "right": "aber gestern" },
+    { "left": "haben wir party gemacht", "right": "haben wir eine Party gefeiert" }
+  ]
 
 2. **reply** — Deine Antwort als ${scenario.role} im Rollenspiel:
 - Bleib STRENG in der Rolle. Du bist kein Lehrer hier, sondern die Person aus der Situation.
@@ -371,4 +384,34 @@ ${history}
 Neue Eingabe vom Lerner: "${newUserText}"
 
 Antworte mit dem JSON-Objekt: { analysis, reply }.`;
+}
+
+// ── Fehlerbericht: AI deep-dive on top errors ────────────────────────────────
+
+export function buildFehlerberichtPrompt(rules: string[]): string {
+  const rulesList = rules
+    .slice(0, 5)
+    .map((r, i) => `${i + 1}. ${r}`)
+    .join("\n");
+
+  return `Du bist ein deutscher Sprachlehrer. Ein Lerner hat folgende wiederkehrende Fehler:
+
+${rulesList}
+
+Erstelle für JEDEN dieser Punkte einen kurzen, konkreten Lerntipp. WICHTIG: KEINE doppelten Anführungszeichen innerhalb der Strings, das zerstört JSON. Nutze stattdessen **Fettschrift** zur Hervorhebung.
+
+Antworte mit EINEM gültigen JSON-Objekt, kein Markdown, keine Codeblöcke:
+
+{
+  "items": [
+    {
+      "title": "kurze Überschrift (max 6 Wörter, mit **Fettschrift** auf Schlüsselbegriff)",
+      "explanation": "1-2 Sätze auf Deutsch, was die Regel ist und WARUM. Mit **Fettschrift**.",
+      "examples": ["Beispielsatz 1", "Beispielsatz 2", "Beispielsatz 3"],
+      "tip": "ein praktischer Merksatz oder Eselsbrücke auf Deutsch (max 15 Wörter)"
+    }
+  ]
+}
+
+Halte alles knapp und konkret. Beispiele MÜSSEN echte deutsche Sätze sein, die ein Lerner sich merken kann. Keine doppelten Anführungszeichen in Beispielen — wenn nötig, schreibe direkte Rede mit ‹...›.`;
 }

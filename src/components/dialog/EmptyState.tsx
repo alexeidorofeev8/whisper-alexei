@@ -29,31 +29,13 @@ export function EmptyState({ isCreating, onCreate }: EmptyStateProps) {
       </div>
 
       <button
-        onClick={() => onCreate("hard")}
+        onClick={() => onCreate("medium")}
         disabled={isCreating}
         className="flex items-center gap-2 rounded-full bg-orange-100 px-5 py-2.5 text-sm font-semibold text-orange-800 hover:bg-orange-200 disabled:cursor-not-allowed disabled:opacity-50 transition-colors shadow-sm"
       >
         <Plus className="h-4 w-4" />
-        Neuer Chat (schwer)
+        Neuer Chat
       </button>
-
-      {!isCreating && (
-        <div className="flex items-center gap-3 text-xs text-stone-400">
-          <button
-            onClick={() => onCreate("easy")}
-            className="hover:text-orange-600 hover:underline transition-colors"
-          >
-            leicht
-          </button>
-          <span className="text-stone-300">·</span>
-          <button
-            onClick={() => onCreate("medium")}
-            className="hover:text-orange-600 hover:underline transition-colors"
-          >
-            mittel
-          </button>
-        </div>
-      )}
     </motion.div>
   );
 }

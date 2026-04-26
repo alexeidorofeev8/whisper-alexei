@@ -23,9 +23,9 @@ export function DialogSidebar({
   return (
     <aside className="flex h-full w-full flex-col gap-3 border-r border-stone-200 bg-white/50 p-3 sm:w-64">
 
-      {/* Primary CTA — always creates a HARD scenario */}
+      {/* Primary CTA */}
       <button
-        onClick={() => onCreate("hard")}
+        onClick={() => onCreate("medium")}
         disabled={isCreating}
         className="flex w-full items-center justify-center gap-2 rounded-xl bg-orange-100 px-3 py-2.5 text-sm font-semibold text-orange-800 hover:bg-orange-200 disabled:opacity-60 disabled:cursor-not-allowed transition-colors shadow-sm"
       >
@@ -41,25 +41,6 @@ export function DialogSidebar({
           </>
         )}
       </button>
-
-      {/* Tiny secondary links for easier difficulties */}
-      {!isCreating && (
-        <div className="flex items-center justify-center gap-3 text-[11px] text-stone-400">
-          <button
-            onClick={() => onCreate("easy")}
-            className="hover:text-orange-600 hover:underline transition-colors"
-          >
-            leicht
-          </button>
-          <span className="text-stone-300">·</span>
-          <button
-            onClick={() => onCreate("medium")}
-            className="hover:text-orange-600 hover:underline transition-colors"
-          >
-            mittel
-          </button>
-        </div>
-      )}
 
       {/* Chats list */}
       <div className="flex-1 overflow-y-auto pt-1">

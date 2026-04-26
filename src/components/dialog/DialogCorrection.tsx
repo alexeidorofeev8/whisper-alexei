@@ -1,26 +1,65 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { AnalysisResult } from "@/lib/types";
-import { CopyButton } from "@/components/correction/CopyButton";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { AnalysisResult, AlignedPair } from "@/lib/types";
 
 interface DialogCorrectionProps {
   analysis: AnalysisResult;
 }
 
-/** Render a string with **bold** markdown segments. */
-function renderBold(text: string): React.ReactNode {
-  const parts = text.split(/(\*\*[^*]+\*\*)/g);
-  return parts.map((part, i) => {
-    if (part.length > 4 && part.startsWith("**") && part.endsWith("**")) {
-      return (
-        <strong key={i} className="font-semibold text-slate-900">
-          {part.slice(2, -2)}
-        </strong>
-      );
-    }
-    return <span key={i}>{part}</span>;
-  });
+interface PhraseProps {
+  pair: AlignedPair;
+  trailingSpace: boolean;
+}
+
+function Phrase({ pair, trailingSpace }: PhraseProps) {
+  const [hovered, setHovered] = useState(false);
+  const same = pair.left.trim() === pair.right.trim();
+
+  if (same) {
+    return (
+      <span lang="de" className="text-slate-800">
+        {pair.right}
+        {trailingSpace ? " " : ""}
+      </span>
+    );
+  }
+
+  return (
+    <span
+      className="relative inline-block"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onTouchStart={() => setHovered((v) => !v)}
+    >
+      <span
+        lang="de"
+        className="cursor-help rounded-md bg-emerald-50 px-1 py-0.5 font-medium text-emerald-900 underline decoration-emerald-300 decoration-dotted underline-offset-4"
+      >
+        {pair.right}
+      </span>
+      {trailingSpace ? " " : ""}
+
+      <AnimatePresence>
+        {hovered && (
+          <motion.span
+            initial={{ opacity: 0, y: 4, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 4, scale: 0.96 }}
+            transition={{ duration: 0.12 }}
+            className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-1 -translate-x-1/2 whitespace-nowrap rounded-lg border border-amber-200 bg-amber-100 px-2.5 py-1 text-xs text-amber-900 shadow-md"
+            role="tooltip"
+          >
+            <span className="mr-1 font-semibold uppercase tracking-wide text-[9px] text-amber-700">
+              du:
+            </span>
+            <span lang="de">{pair.left}</span>
+          </motion.span>
+        )}
+      </AnimatePresence>
+    </span>
+  );
 }
 
 export function DialogCorrection({ analysis }: DialogCorrectionProps) {
@@ -39,7 +78,7 @@ export function DialogCorrection({ analysis }: DialogCorrectionProps) {
     );
   }
 
-  const bullets = analysis.errors.slice(0, 3).map((e) => e.rule_name);
+  const aligned = analysis.aligned ?? [];
 
   return (
     <motion.div
@@ -48,24 +87,21 @@ export function DialogCorrection({ analysis }: DialogCorrectionProps) {
       transition={{ duration: 0.2 }}
       className="mx-4 rounded-2xl border border-stone-200 bg-white px-4 py-3 shadow-sm"
     >
-      <div className="mb-1.5 flex items-center justify-between gap-2">
-        <h4 className="text-[10px] font-semibold uppercase tracking-wider text-stone-500">
-          Korrigiert
-        </h4>
-        <CopyButton text={analysis.corrected} />
-      </div>
-      <p lang="de" className="mb-2.5 text-sm leading-relaxed text-slate-800">
-        {analysis.corrected}
-      </p>
-
-      <ul lang="de" className="flex flex-col gap-1 text-xs text-slate-600">
-        {bullets.map((b, i) => (
-          <li key={i} className="flex gap-1.5 leading-snug">
-            <span className="text-orange-400 select-none">•</span>
-            <span>{renderBold(b)}</span>
-          </li>
-        ))}
-      </ul>
+      {aligned.length > 0 ? (
+        <p lang="de" className="text-sm leading-loose">
+          {aligned.map((pair, i) => (
+            <Phrase
+              key={i}
+              pair={pair}
+              trailingSpace={i < aligned.length - 1}
+            />
+          ))}
+        </p>
+      ) : (
+        <p lang="de" className="text-sm font-medium leading-relaxed text-slate-900">
+          {analysis.corrected}
+        </p>
+      )}
     </motion.div>
   );
 }
