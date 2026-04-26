@@ -38,8 +38,10 @@ export interface AnalysisResult {
   ai_response: string;
   level_assessment: string;
   study_tip: string;
-  /** Side-by-side phrase pairs splitting the original and corrected into ~3-7 short fragments. */
+  /** Side-by-side phrase pairs (legacy — no longer used in UI but kept for backward compatibility). */
   aligned?: AlignedPair[];
+  /** Fully restructured rephrasing in the style a native speaker would actually use. */
+  native_variant?: string;
 }
 
 export type TargetLanguage = "de" | "en";

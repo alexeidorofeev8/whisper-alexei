@@ -333,7 +333,7 @@ Bei jedem Lerner-Turn machst du ZWEI Dinge in einem JSON-Objekt:
   "ai_response": string,
   "level_assessment": "A2" | "B1" | "B2" | "C1" | "C2",
   "study_tip": string,
-  "aligned": Array<{ "left": string, "right": string }>
+  "native_variant": string
 }
 
 Regeln für analysis:
@@ -350,13 +350,11 @@ Regeln für analysis:
 - alternatives, word_examples: leer lassen ([]).
 - ai_response: leerer String — wir nutzen das Feld nicht.
 - level_assessment und study_tip: ein einzelnes kurzes Wort/Satz reicht (z.B. "B2", "weiter so").
-- aligned: PFLICHT-Feld. Teile den Originaltext UND die korrigierte Version in dieselbe Anzahl kurzer Phrasen-Paare auf (3 bis 7 Paare). Jede Phrase 2-6 Wörter. Aufteilung an natürlichen Phrasengrenzen: Zeitangabe / Subjekt / Verb-Phrase / Objekt / Nebensatz / Adverbiale. WICHTIG: links = exakt das was der Lerner geschrieben hat (mit Fehlern), rechts = wie es richtig sein sollte. Auch wenn die Phrase identisch ist, behalte sie im Paar bei. Verwende KEINE doppelten Anführungszeichen innerhalb der Strings. Wenn der Satz komplett korrekt ist: aligned leer lassen ([]).
-  Beispiel — Original: "ich bin sorry aber gestern haben wir party gemacht", Korrigiert: "Ich entschuldige mich, aber gestern haben wir eine Party gefeiert":
-  [
-    { "left": "ich bin sorry", "right": "Ich entschuldige mich" },
-    { "left": "aber gestern", "right": "aber gestern" },
-    { "left": "haben wir party gemacht", "right": "haben wir eine Party gefeiert" }
-  ]
+- native_variant: PFLICHT-Feld. Eine VOLLSTÄNDIG umformulierte Version, wie sie ein deutscher Muttersprachler im Alltag tatsächlich SAGEN würde. Nicht nur Grammatik-Korrektur — anderer Satzbau, andere Reihenfolge, idiomatische Wendungen, natürliche Verkürzungen, aktive Konstruktionen. Wenn der Originalsatz schon komplett natürlich klingt, darf native_variant gleich corrected sein. KEINE doppelten Anführungszeichen.
+  Beispiel — Original: "ich bin sorry aber gestern haben wir party gemacht und es war ein bisschen lauter als ublich":
+  - corrected: "Ich entschuldige mich, aber gestern haben wir eine Party gefeiert, und es war ein bisschen lauter als üblich."
+  - native_variant: "Sorry für gestern — wir hatten ne kleine Feier, da ist es halt etwas lauter geworden."
+  Der native_variant ist erkennbar anders strukturiert: lockerer Anfang, Gedankenstrich, Kurzform 'ne, Modalpartikel 'halt'.
 
 2. **reply** — Deine Antwort als ${scenario.role} im Rollenspiel:
 - Bleib STRENG in der Rolle. Du bist kein Lehrer hier, sondern die Person aus der Situation.

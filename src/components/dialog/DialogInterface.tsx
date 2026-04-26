@@ -53,7 +53,7 @@ export function DialogInterface() {
           <EmptyState isCreating={isCreating} onCreate={createNewChat} />
         ) : (
           <>
-            <div className="px-4 pt-4">
+            <div className="mx-auto w-full max-w-6xl px-4 pt-4">
               <div className="mb-2 flex items-center justify-end">
                 <StreakBadge />
               </div>
@@ -65,17 +65,21 @@ export function DialogInterface() {
             </div>
 
             {error && (
-              <div className="mx-4 mb-2 rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-xs text-red-700">
-                <span className="font-medium">Fehler:</span> {error}
+              <div className="mx-auto w-full max-w-6xl px-4 mb-2">
+                <div className="rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-xs text-red-700">
+                  <span className="font-medium">Fehler:</span> {error}
+                </div>
               </div>
             )}
 
-            <div className="border-t border-stone-200 bg-white/90 backdrop-blur-xl px-2">
-              <InputBar
-                onSubmit={sendUserTurn}
-                placeholder="Antworte auf Deutsch…"
-                speechLang="de-DE"
-              />
+            <div className="border-t border-stone-200 bg-white/90 backdrop-blur-xl">
+              <div className="mx-auto w-full max-w-6xl px-2">
+                <InputBar
+                  onSubmit={sendUserTurn}
+                  placeholder="Antworte auf Deutsch…"
+                  speechLang="de-DE"
+                />
+              </div>
             </div>
           </>
         )}

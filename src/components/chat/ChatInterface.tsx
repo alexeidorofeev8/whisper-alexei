@@ -12,7 +12,7 @@ export function ChatInterface() {
   return (
     <div className="flex flex-col h-screen bg-[#FDF8F4]">
       <AppHeader />
-      <div className="flex-1 overflow-hidden flex flex-col max-w-5xl w-full mx-auto">
+      <div className="flex-1 overflow-hidden flex flex-col w-full">
         {currentMode === "dialog" && <DialogInterface />}
         {currentMode === "correction" && <KorrekturInterface />}
         {currentMode === "progress" && <FortschrittInterface />}
