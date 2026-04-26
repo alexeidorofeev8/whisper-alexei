@@ -10,9 +10,11 @@ import { VoiceWaveform } from "./VoiceWaveform";
 interface InputBarProps {
   onSubmit: (text: string) => void;
   placeholder?: string;
+  /** Force a specific BCP-47 lang for speech recognition (e.g. "de-DE"). Overrides the targetLanguage-derived default. */
+  speechLang?: string;
 }
 
-export function InputBar({ onSubmit, placeholder }: InputBarProps) {
+export function InputBar({ onSubmit, placeholder, speechLang: speechLangOverride }: InputBarProps) {
   const [draft, setDraft] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -23,7 +25,7 @@ export function InputBar({ onSubmit, placeholder }: InputBarProps) {
 
   const isRecording = recordingState === "recording";
   const isError = recordingState === "error";
-  const speechLang = targetLanguage === "en" ? "en-US" : "de-DE";
+  const speechLang = speechLangOverride ?? (targetLanguage === "en" ? "en-US" : "de-DE");
 
   // When voice finishes — put transcript into textarea for editing, don't auto-submit
   const handleVoiceFinal = useCallback((transcript: string) => {

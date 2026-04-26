@@ -84,13 +84,12 @@ export function AppHeader() {
         </h1>
       </div>
 
-      {/* Mode tabs — center */}
-      <ModeTabs />
-
-      {/* Right controls */}
-      <div className="flex items-center gap-2 shrink-0">
-        <LanguageSwitcher />
-      </div>
+      {/* Mode tabs and language switcher hidden for now — Korrektur is the only active mode.
+          Re-enable when extending back to multi-mode UX:
+          <ModeTabs />
+          <div className="flex items-center gap-2 shrink-0"><LanguageSwitcher /></div>
+      */}
+      <div className="flex-1" />
     </header>
   );
 }

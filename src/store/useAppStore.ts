@@ -77,7 +77,7 @@ export const useAppStore = create<AppState>((set) => ({
   targetLanguage: "en",
   setTargetLanguage: (lang) => set({ targetLanguage: lang }),
 
-  currentMode: "translation",
+  currentMode: "correction",
   setCurrentMode: (m) => set({ currentMode: m }),
 
   translationDifficulty: "easy",

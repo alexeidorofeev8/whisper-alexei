@@ -9,6 +9,24 @@ interface KorrekturFeedbackProps {
   result: CorrectionResult;
 }
 
+/**
+ * Render a string with simple **bold** markdown segments.
+ * Falls back to plain text for everything else. No nested formatting.
+ */
+function renderBold(text: string): React.ReactNode {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return parts.map((part, i) => {
+    if (part.length > 4 && part.startsWith("**") && part.endsWith("**")) {
+      return (
+        <strong key={i} className="font-semibold text-slate-900">
+          {part.slice(2, -2)}
+        </strong>
+      );
+    }
+    return <span key={i}>{part}</span>;
+  });
+}
+
 export function KorrekturFeedback({ result }: KorrekturFeedbackProps) {
   return (
     <motion.div
@@ -34,13 +52,13 @@ export function KorrekturFeedback({ result }: KorrekturFeedbackProps) {
         </p>
       </section>
 
-      {/* Native variant */}
+      {/* Native */}
       {result.native_variant && result.native_variant.trim() && result.native_variant !== result.corrected && (
         <section className="border-t border-slate-100 pt-4">
           <div className="mb-2 flex items-center justify-between gap-2">
             <h3 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
               <Sparkles className="w-3 h-3 text-orange-400" />
-              Wie ein Muttersprachler
+              Nativ
             </h3>
             <CopyButton text={result.native_variant} label="Kopieren" />
           </div>
@@ -60,7 +78,7 @@ export function KorrekturFeedback({ result }: KorrekturFeedbackProps) {
             {result.notes.map((note, i) => (
               <li key={i} className="flex gap-2">
                 <span className="text-orange-400 select-none">•</span>
-                <span className="leading-snug">{note}</span>
+                <span className="leading-snug">{renderBold(note)}</span>
               </li>
             ))}
           </ul>
@@ -73,7 +91,7 @@ export function KorrekturFeedback({ result }: KorrekturFeedbackProps) {
           <div className="flex items-start gap-2 text-sm text-slate-600">
             <Lightbulb className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
             <p lang="de" className="leading-snug">
-              {result.tip}
+              {renderBold(result.tip)}
             </p>
           </div>
         </section>

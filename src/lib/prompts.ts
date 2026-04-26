@@ -226,8 +226,8 @@ Schema:
 Regeln:
 - "corrected": Eine saubere, natürlich klingende deutsche Version, die man direkt in Microsoft Teams, E-Mail oder Chat senden kann. Behalte den ursprünglichen Stil (formell oder informell, Du oder Sie). Korrigiere stillschweigend Großschreibung am Satzanfang, markiere das niemals als Fehler.
 - "native_variant": Eine alternative Formulierung, wie sie ein deutscher Muttersprachler im Arbeitsalltag tatsächlich sagen würde: etwas idiomatischer, knapper oder natürlicher. Nicht zwingend besser, nur anders.
-- "notes": Maximal 3 kurze Hinweise zu den wichtigsten Korrekturen. JEDER Hinweis maximal 12 Wörter. AUSSCHLIESSLICH auf Deutsch, niemals Russisch oder Englisch. Strukturell und konkret: nenne den Kasus, die Verbposition, das richtige Wort. Beispiele: "Akkusativ statt Dativ nach 'durch'", "Verb am Satzende im Nebensatz", "'erhalten' klingt im Büro formeller als 'bekommen'". KEINE langen Erklärungen.
-- "tip": Optional. Ein einziger weiterer Hinweis oder ein kurzes Beispiel desselben Musters in einem anderen Kontext. Maximal 15 Wörter, auf Deutsch.
+- "notes": Maximal 3 kurze Hinweise zu den wichtigsten Korrekturen. JEDER Hinweis maximal 12 Wörter. AUSSCHLIESSLICH auf Deutsch, niemals Russisch oder Englisch. Strukturell und konkret: nenne den Kasus, die Verbposition, das richtige Wort. **Wichtig zur Formatierung:** Hebe Schlüsselwörter (Kasus-Namen, deutsche Wörter aus dem Satz, grammatische Begriffe) mit Markdown-Fettschrift hervor: schreibe **Akkusativ** statt 'Akkusativ', schreibe **den Bericht** statt 'den Bericht'. Verwende KEINE einfachen Anführungszeichen. Beispiele: "**Akkusativ** statt **Dativ** nach **durch**", "**Verb** am Satzende im Nebensatz", "**erhalten** klingt im Büro formeller als **bekommen**". KEINE langen Erklärungen.
+- "tip": Optional. Ein einziger weiterer Hinweis oder ein kurzes Beispiel desselben Musters in einem anderen Kontext. Maximal 15 Wörter, auf Deutsch. Verwende auch hier **Fettschrift** für Schlüsselwörter, keine einfachen Anführungszeichen.
 
 Wenn der Text bereits korrekt ist:
 - "corrected" gleich Eingabetext (eventuell mit korrigierter Großschreibung)
