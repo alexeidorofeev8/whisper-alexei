@@ -8,7 +8,6 @@ import { useAppStore } from "@/store/useAppStore";
 
 interface DialogMessageListProps {
   turns: DialogTurn[];
-  role: string;
   isLoading: boolean;
 }
 
@@ -37,7 +36,7 @@ function groupTurns(turns: DialogTurn[]): TurnGroup[] {
   return groups;
 }
 
-function AssistantBubble({ text, role }: { text: string; role: string }) {
+function AssistantBubble({ text }: { text: string }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 4 }}
@@ -45,20 +44,15 @@ function AssistantBubble({ text, role }: { text: string; role: string }) {
       className="mx-auto w-full max-w-5xl px-4"
     >
       <div className="flex justify-start">
-        <div className="w-full max-w-xs">
-          <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-stone-400">
-            {role}
-          </p>
-          <div className="rounded-2xl rounded-tl-sm border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-800 shadow-sm whitespace-pre-wrap">
-            {text}
-          </div>
+        <div className="w-full max-w-xs rounded-2xl rounded-tl-sm border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-800 shadow-sm whitespace-pre-wrap">
+          {text}
         </div>
       </div>
     </motion.div>
   );
 }
 
-export function DialogMessageList({ turns, role, isLoading }: DialogMessageListProps) {
+export function DialogMessageList({ turns, isLoading }: DialogMessageListProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const isAnalyzing = useAppStore((s) => s.isAnalyzing);
 
@@ -78,15 +72,13 @@ export function DialogMessageList({ turns, role, isLoading }: DialogMessageListP
                 originalText={g.user.text}
                 analysis={g.user.analysis}
               />
-              {g.assistant && (
-                <AssistantBubble text={g.assistant.text} role={role} />
-              )}
+              {g.assistant && <AssistantBubble text={g.assistant.text} />}
             </Fragment>
           );
         }
         // Standalone assistant turn (the scenario opener)
         const a = g.assistant!;
-        return <AssistantBubble key={g.key} text={a.text} role={role} />;
+        return <AssistantBubble key={g.key} text={a.text} />;
       })}
 
       {(isLoading || isAnalyzing) && (
