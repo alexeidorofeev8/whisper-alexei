@@ -270,19 +270,69 @@ export function buildScenarioPrompt(
       ? `\nDer Lerner hat häufig Probleme mit: ${weakRules.join(", ")}. Wähle ein Szenario, das diese Strukturen natürlich provoziert.`
       : "";
 
-  return `Du generierst ein deutsches Konversationsszenario für einen Russisch-sprechenden Sprachlerner in Deutschland.
+  return `Du generierst ein deutsches Konversationsszenario für einen Russisch-sprechenden Sprachlerner in Deutschland. Der Lerner ist ein erwachsener Software-Entwickler/Tech-Profi, der echte Lebenssituationen üben möchte — also bevorzuge erwachsene, moderne, manchmal auch komische oder herausfordernde Lagen.
 
 Schwierigkeit: ${difficulty}. ${DIFFICULTY_HINTS_DE[difficulty]}
 
-Wähle eine Rolle aus einem breiten Spektrum (variiere stark, sei kreativ):
-- Arbeit: Kollege im Standup, Chefin beim 1:1, Teamleiter im Krisenmeeting, neue Praktikantin, Kunde am Telefon, IT-Support, HR-Mitarbeiter
-- Service: Bäcker, Apotheker, Arzt, Frisör, Kellner, Verkäufer im Drogeriemarkt, Optiker, Postbeamter
-- Behörden: Bürgeramt-Beamter, Finanzamt, Krankenkasse, Kita-Leitung, Schulsekretariat, Zoll
-- Sozial: Nachbar im Treppenhaus, fremder Reisender im ICE, Eltern beim Kindergeburtstag, Trainerin im Sportverein
-- Familie: Schwiegermutter, Onkel beim Weihnachtsessen, älterer Verwandter am Telefon
-- Unerwartet: Fahrkartenkontrolleur, Polizist bei Verkehrskontrolle, Handwerker am Telefon, Vermieter mit Beschwerde
+Wähle eine Rolle aus einem SEHR BREITEN Spektrum (variiere stark, sei kreativ, MISCHE die Bereiche):
 
-Erfinde eine konkrete, lebendige Situation (1-2 Sätze) die natürlich zur Konversation einlädt.${avoidBlock}${weakBlock}
+Tech & Arbeit:
+- Senior-Kollege im Standup-Meeting, der nach Status fragt
+- Tech Lead, der ein Code-Review-Feedback geben will
+- HR im Gehaltsverhandlungsgespräch
+- Recruiter aus LinkedIn-Outreach am Telefon
+- Product Manager der eine Deadline verschieben will
+- Junior, der um Hilfe bittet
+- Kunde der per Slack eine schwierige Beschwerde einreicht
+- CEO bei einer All-Hands-Q&A
+- Externer Consultant beim Onboarding
+- DevOps der nach 3 Uhr nachts wegen Production-Outage anruft
+
+Dating & Flirten (variiere zwischen männlich und weiblich, oft weiblich da der Lerner ein Mann ist):
+- Eine Frau aus einer Dating-App beim ersten Kaffee, leicht verschmitzt, stellt unerwartete Fragen
+- Sie beim zweiten Date in einer Bar, das Gespräch wird gerade flirty
+- Eine Frau im Yoga-Studio, die du nach dem Kurs anlächelst und ins Gespräch kommst
+- Eine Kollegin nach Feierabend in der Kantine, lockerer Smalltalk mit mehr drin als nur Smalltalk
+- Eine Frau im Café, die deinen Laptop oder dein Buch interessant findet
+- Eine alte Bekannte (Studienzeit), zufällig im Späti getroffen, beide flirty Stimmung
+- Eine Tinder-Match die schreibt nach drei Tagen Schweigen wieder, will sich treffen
+- Sprachpartnerin im Tandem-Café, die mehr als nur Deutsch lernen möchte
+
+Soziales & Privatleben:
+- Alter Studienfreund, zufällig in der U-Bahn getroffen
+- WG-Mitbewohner-Kandidat bei der Besichtigung
+- Therapeut/in beim Erstgespräch
+- Personal Trainer im Fitnessstudio
+- Nachbar, der sich wegen Lärm beschwert (oder Hilfe braucht)
+- Freund/in, der/die schwierige private News teilt
+
+Service & Alltag:
+- Apotheker, Arzt, Bäcker, Frisör, Optiker, Kellner, Sommelier
+- Mitarbeiter beim Möbelhaus (Reklamation)
+- Verkäufer für Elektronik mit komplexen Fragen
+
+Behörden:
+- Bürgeramt-Beamter mit fehlenden Dokumenten
+- Finanzbeamter zur Steuererklärung
+- Krankenkassenmitarbeiter zu einem Antrag
+- Vermieter bei Wohnungsübergabe
+- Hausverwaltung wegen Nebenkostenabrechnung
+
+Unerwartet & Lebendig:
+- Fremder im Café spricht dich an, weil er deinen Laptop interessant findet
+- Ein Kollege bittet kurz vor dem Wochenende um Übernahme einer Aufgabe
+- Polizist bei einer Verkehrskontrolle (du als Zeuge eines Vorfalls)
+- Journalist, der dich zu einem Tech-Thema interviewt
+- Verkäufer an deiner Tür
+- Ein Bekannter, der sich Geld leihen will
+- Ein Fremder im Park bittet um Wegbeschreibung in einer Sprache, die du kaum verstehst
+- Ein älterer Herr im Zug fängt ein langes Gespräch über Politik an
+
+Erfinde eine konkrete, lebendige Situation (1-2 Sätze) mit klarem KONFLIKT oder INTERESSANTER WENDUNG. Es muss etwas auf dem Spiel stehen oder etwas Unerwartetes geben — kein bloßes "fragt nach Empfehlung". Beispiele guter Situationen:
+- "Will dir am Tag vor der Demo erklären, dass die API umgebaut werden muss"
+- "Glaubt, dass ihr euch schon mal getroffen habt, du erinnerst dich aber nicht"
+- "Hat dein Code-Review erst nach drei Tagen gesehen und ist genervt"
+- "Vermutet, dass du das Date abbrechen willst, und fragt direkt nach"${avoidBlock}${weakBlock}
 
 Gib EIN JSON-Objekt zurück, keine Codeblöcke, kein Markdown, nichts ausserhalb:
 
@@ -361,21 +411,38 @@ Beispiel — Original: "ja das ist die beste lösung für mich ich habe magenmit
 Beachte: corrected hält sich nah an die Originalstruktur (lange Aufzählung mit 'und', Wort 'Magenmittel' korrigiert zu 'Magenprobleme'), während native_variant die Sätze umbaut, Gedankenstrich nutzt, 'angeschlagen' verwendet, kürzer und idiomatischer ist.
 
 2. **reply** — Deine Antwort als ${scenario.role} im Rollenspiel:
-- Bleib STRENG in der Rolle. Du bist kein Lehrer hier, sondern die Person aus der Situation.
-- KURZ HALTEN: maximal 15 Wörter, ideal 6-12. Wie echte Sprache: oft nur EINE einfache Frage oder EIN kurzer Satz + Frage. Keine langen Vorreden, keine ausführlichen Erklärungen, kein Setting-Aufbau.
-- Einfacher Satzbau, klar und direkt. Stell eine konkrete Frage oder gib eine kurze Reaktion.
-- Reagiere auf den INHALT (corrected version) der Lerner-Eingabe, nicht auf die Fehler.
-- Treibe das Gespräch vorwärts mit einer einzigen, klaren Frage. Nicht mehrere Fragen auf einmal.
-- Auch bei "hard" Schwierigkeit: KURZ. Komplexität liegt im Vokabular, nicht in der Länge.
 
-Beispiele für gute reply-Werte (kurz, lebendig, mit klarer Frage):
-- "Verstehe. Wann genau hat es angefangen?"
-- "Schade. Haben Sie schon was probiert?"
-- "Kein Problem. Möchten Sie es vor Ort essen?"
-- "Aha. Und wie lange dauert das schon?"
+WICHTIGSTE REGEL: SEHR KURZ. Maximal 10 Wörter. Ideal 3-7 Wörter. Wie eine SMS, nicht wie ein Lehrbuch.
 
-Beispiele für SCHLECHTE reply-Werte (zu lang, zu erklärend):
-- "Ich verstehe — seit gestern Abend, und nichts hat bisher angeschlagen. Darf ich fragen, was genau Sie spüren: eher Sodbrennen und Säure, oder eher ein Druckgefühl und Übelkeit?"  ← VIEL zu lang, mehrere Fragen, zu viel Setup.
+- Bleib STRENG in der Rolle. Du bist kein Lehrer.
+- ENTWEDER eine kurze Reaktion, ODER eine kurze Frage. Selten beides.
+- Niemals mehrere Fragen in einer Antwort.
+- Niemals Aufzählungen ('eher A, oder B, oder C').
+- Niemals Vorreden ('Ich verstehe — ...', 'Aha, also...').
+- Auch bei "hard" Schwierigkeit: KURZ. Schwierigkeit ist im Vokabular, nicht in der Länge.
+- LEBENDIG bleiben: Die Stimmung darf sich entwickeln. Bei Dating-Szenarien etwas verschmitzt/flirty werden, beim Standup vielleicht plötzlich genervt, beim Smalltalk neugieriger. Reagiere wie ein echter Mensch mit Laune.
+- DYNAMIK / WENDUNGEN: Wenn das Gespräch stagniert (etwa alle 3-5 Turns), darfst und sollst du es lebendig machen:
+  * Eine neue Person kommt dazu, die spricht: "*Eine Kollegin kommt rein.* Hi, alles klar?"
+  * Du wechselst zu einer anderen Figur: "*Apotheker geht, eine Praktikantin übernimmt.* Hallo, kann ich helfen?"
+  * Etwas passiert: "*Telefon klingelt.* Moment, kurz." oder "*Sie lacht plötzlich.* Du machst Witze, oder?"
+  * Stimmungswechsel: "Ach komm, jetzt mal ehrlich..." oder "Stop, das wird mir zu viel."
+  Ein einzelner Reply darf eine kurze szenische Notiz in *Sternchen* + 1 Satz Dialog enthalten — alles zusammen unter 15 Wörtern. Es muss SICH ENTWICKELN: ein Date kann von Smalltalk zu Flirten zu Konflikt zu Versöhnung gehen, ein Standup kann eskalieren, ein Apothekerinbesuch kann den Chef reinrufen.
+- Wenn ein neuer Charakter erscheint, ist DIE NÄCHSTE Reply von dieser Figur — bleib dann in der neuen Stimme, bis sich wieder etwas ändert.
+
+GUTE Beispiele (3-9 Wörter, eine Sache):
+- "Wann hat das angefangen?"
+- "Schade. Schon Tabletten genommen?"
+- "Hier oder zum Mitnehmen?"
+- "Wie lange schon?"
+- "Was genau tut weh?"
+- "Aha, verstehe."
+- "Mit Eis dazu?"
+- "Brauchen Sie eine Tüte?"
+
+SCHLECHTE Beispiele (zu lang, mehrere Fragen, Erklärungen):
+- "Ich verstehe — seit gestern Abend, und nichts hat bisher angeschlagen. Darf ich fragen, was genau Sie spüren: eher Sodbrennen und Säure, oder eher ein Druckgefühl und Übelkeit?"
+- "Das tut mir leid zu hören. Haben Sie denn auch versucht, Ingwertee zu trinken oder vielleicht eine Wärmflasche aufzulegen?"
+- Beide sind VIEL zu lang. Stattdessen: "Was genau spüren Sie?" oder "Schon Tee versucht?"
 
 Output: EIN JSON-Objekt, keine Codeblöcke, kein Markdown:
 {
