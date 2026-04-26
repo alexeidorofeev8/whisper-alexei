@@ -350,18 +350,32 @@ Regeln für analysis:
 - alternatives, word_examples: leer lassen ([]).
 - ai_response: leerer String — wir nutzen das Feld nicht.
 - level_assessment und study_tip: ein einzelnes kurzes Wort/Satz reicht (z.B. "B2", "weiter so").
-- native_variant: PFLICHT-Feld. Eine SANFT umformulierte Version, wie ein deutscher Muttersprachler den GLEICHEN Inhalt natürlicher ausdrücken würde. WICHTIG: der SINN bleibt nahezu identisch — nicht stark verändern, nicht stark kürzen, keine zusätzlichen Informationen. Erlaubt: leicht andere Wortwahl, natürlichere Reihenfolge, eine idiomatische Wendung, eine kleine Modalpartikel (mal, doch, eben, halt). Verboten: drastische Umstellung, Gefühlsfärbung hinzufügen, Inhalt weglassen oder ergänzen, Slang. Wenn der Originalsatz bereits natürlich klingt, darf native_variant gleich corrected sein. KEINE doppelten Anführungszeichen.
-  Beispiel — Original: "ich bin sorry aber gestern haben wir party gemacht und es war ein bisschen lauter als ublich":
-  - corrected: "Ich entschuldige mich, aber gestern haben wir eine Party gefeiert, und es war ein bisschen lauter als üblich."
-  - native_variant: "Tut mir leid, aber wir hatten gestern eine Party und da wurde es leider etwas lauter als sonst."
-  Beachte: der Sinn ist praktisch derselbe, nur der Ton ist natürlicher und das Vokabular alltäglicher.
+- corrected: das ist die GRAMMATIKALISCH korrigierte Version. Behalte die Wortwahl, die Wortstellung und den Stil des Lerners so weit wie möglich. Nur Fehler werden behoben (Kasus, Artikel, Verbposition, Rechtschreibung, falsche Wörter), die Struktur bleibt nah am Original. Auch wenn es etwas unbeholfen klingt — solange es grammatikalisch korrekt ist, ist es richtig. KEIN umformulieren, KEIN Stil-Upgrade.
+
+- native_variant: PFLICHT-Feld, separat von corrected. Das ist die FREIE Umformulierung — wie ein deutscher Muttersprachler die gleiche Aussage in dieser Situation tatsächlich SAGEN würde. Hier darfst und sollst du den Satzbau ändern, andere Verben wählen, Sätze zusammenfassen oder umbauen, idiomatische Wendungen einsetzen, natürliche Konnektoren ('deshalb', 'also', 'nämlich') hinzufügen. Der Sinn (die Hauptinformation) bleibt erhalten, aber die Formulierung wird klar anders und natürlicher. Wenn der Originalsatz bereits perfekt natürlich klingt, darf native_variant gleich corrected sein. KEINE doppelten Anführungszeichen.
+
+Beispiel — Original: "ja das ist die beste lösung für mich ich habe magenmittel seit gestern abend und ich habe viel ausprobiert und hat nicht geholfen und ich habe zu hause noch zwei gute medikamenten aber die haben mir gar nichts gutes gemacht und bin ich bei ihnen gekommen":
+  - corrected: "Ja, das ist die beste Lösung für mich. Ich habe seit gestern Abend Magenprobleme, ich habe viel ausprobiert und es hat nicht geholfen. Ich habe zu Hause noch zwei Medikamente, aber die haben mir gar nicht geholfen, und deshalb bin ich zu Ihnen gekommen."
+  - native_variant: "Ja, das passt für mich. Ich habe seit gestern Abend Magenbeschwerden — ich habe schon einiges versucht, aber nichts hat geholfen. Zwei Medikamente von zu Hause haben auch nicht angeschlagen, deshalb komme ich jetzt zu Ihnen."
+
+Beachte: corrected hält sich nah an die Originalstruktur (lange Aufzählung mit 'und', Wort 'Magenmittel' korrigiert zu 'Magenprobleme'), während native_variant die Sätze umbaut, Gedankenstrich nutzt, 'angeschlagen' verwendet, kürzer und idiomatischer ist.
 
 2. **reply** — Deine Antwort als ${scenario.role} im Rollenspiel:
 - Bleib STRENG in der Rolle. Du bist kein Lehrer hier, sondern die Person aus der Situation.
-- 1-2 Sätze auf Deutsch, natürlich, alltagstauglich.
+- KURZ HALTEN: maximal 15 Wörter, ideal 6-12. Wie echte Sprache: oft nur EINE einfache Frage oder EIN kurzer Satz + Frage. Keine langen Vorreden, keine ausführlichen Erklärungen, kein Setting-Aufbau.
+- Einfacher Satzbau, klar und direkt. Stell eine konkrete Frage oder gib eine kurze Reaktion.
 - Reagiere auf den INHALT (corrected version) der Lerner-Eingabe, nicht auf die Fehler.
-- Treibe das Gespräch vorwärts: stelle eine Frage, gib eine Reaktion, ändere leicht die Richtung.
-- Schwierigkeit beachten: bei "easy" einfache Sätze, bei "hard" anspruchsvolleres Vokabular.
+- Treibe das Gespräch vorwärts mit einer einzigen, klaren Frage. Nicht mehrere Fragen auf einmal.
+- Auch bei "hard" Schwierigkeit: KURZ. Komplexität liegt im Vokabular, nicht in der Länge.
+
+Beispiele für gute reply-Werte (kurz, lebendig, mit klarer Frage):
+- "Verstehe. Wann genau hat es angefangen?"
+- "Schade. Haben Sie schon was probiert?"
+- "Kein Problem. Möchten Sie es vor Ort essen?"
+- "Aha. Und wie lange dauert das schon?"
+
+Beispiele für SCHLECHTE reply-Werte (zu lang, zu erklärend):
+- "Ich verstehe — seit gestern Abend, und nichts hat bisher angeschlagen. Darf ich fragen, was genau Sie spüren: eher Sodbrennen und Säure, oder eher ein Druckgefühl und Übelkeit?"  ← VIEL zu lang, mehrere Fragen, zu viel Setup.
 
 Output: EIN JSON-Objekt, keine Codeblöcke, kein Markdown:
 {

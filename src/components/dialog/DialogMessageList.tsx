@@ -42,10 +42,10 @@ function AssistantBubble({ text, role }: { text: string; role: string }) {
     <motion.div
       initial={{ opacity: 0, y: 4 }}
       animate={{ opacity: 1, y: 0 }}
-      className="mx-auto w-full max-w-3xl px-4"
+      className="mx-auto w-full max-w-5xl px-4"
     >
       <div className="flex justify-start">
-        <div className="max-w-[85%]">
+        <div className="w-full max-w-xs">
           <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-stone-400">
             {role}
           </p>
@@ -90,7 +90,7 @@ export function DialogMessageList({ turns, role, isLoading }: DialogMessageListP
       })}
 
       {(isLoading || isAnalyzing) && (
-        <div className="mx-auto w-full max-w-3xl px-4">
+        <div className="mx-auto w-full max-w-5xl px-4">
           <div className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-4 py-2 shadow-sm">
             {[0, 1, 2].map((i) => (
               <span

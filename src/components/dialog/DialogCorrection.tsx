@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Sparkles } from "lucide-react";
 import { AnalysisResult, GrammarError } from "@/lib/types";
 
 interface DialogCorrectionProps {
@@ -108,7 +109,7 @@ export function DialogCorrection({ originalText, analysis }: DialogCorrectionPro
         initial={{ opacity: 0, y: 4 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.18 }}
-        className="mx-auto w-full max-w-3xl px-4"
+        className="mx-auto w-full max-w-5xl px-4"
       >
         <div className="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
           <h4 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-stone-500">
@@ -122,23 +123,24 @@ export function DialogCorrection({ originalText, analysis }: DialogCorrectionPro
     );
   }
 
-  // Right column: prefer the native-style rephrase if it adds value, else just corrected.
-  const nativeRewrite =
-    analysis.native_variant && analysis.native_variant.trim().length > 0
-      ? analysis.native_variant.trim()
-      : analysis.corrected;
-
   const hasErrors = analysis.errors.length > 0;
+  const nativeText = analysis.native_variant?.trim();
+  const showNative =
+    nativeText && nativeText.length > 0 && nativeText !== analysis.corrected.trim();
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 4 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.18 }}
-      className="mx-auto w-full max-w-3xl px-4"
+      className="mx-auto w-full max-w-5xl px-4"
     >
       <div className="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5">
+        <div
+          className={`grid grid-cols-1 gap-4 md:gap-5 ${
+            showNative ? "md:grid-cols-3" : "md:grid-cols-2"
+          }`}
+        >
 
           {/* LEFT — original with pale-yellow error highlights */}
           <div>
@@ -152,19 +154,32 @@ export function DialogCorrection({ originalText, analysis }: DialogCorrectionPro
             />
           </div>
 
-          {/* RIGHT — single block: how a native would say it */}
+          {/* MIDDLE — grammatically corrected, close to user's original wording */}
           <div className="md:border-l md:border-stone-100 md:pl-5">
             <h4 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-600">
               Korrigiert
             </h4>
-            {hasErrors || nativeRewrite !== originalText ? (
+            {hasErrors ? (
               <p lang="de" className="text-sm font-medium leading-relaxed text-slate-900">
-                {nativeRewrite}
+                {analysis.corrected}
               </p>
             ) : (
               <p className="text-xs text-emerald-700">✓ Alles korrekt</p>
             )}
           </div>
+
+          {/* RIGHT — full native rephrase (only when meaningfully different) */}
+          {showNative && (
+            <div className="md:border-l md:border-stone-100 md:pl-5">
+              <h4 className="mb-1.5 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-orange-600">
+                <Sparkles className="h-3 w-3" />
+                Wie ein Muttersprachler
+              </h4>
+              <p lang="de" className="text-sm italic leading-relaxed text-stone-700">
+                {nativeText}
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </motion.div>
