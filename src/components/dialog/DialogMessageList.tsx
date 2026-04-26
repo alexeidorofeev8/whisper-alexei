@@ -1,44 +1,14 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { DialogTurn, Message } from "@/lib/types";
-import { UserBubble } from "@/components/chat/UserBubble";
-import { AnalysisBubble } from "@/components/chat/AnalysisBubble";
-import { AiBubble } from "@/components/chat/AiBubble";
+import { motion } from "framer-motion";
+import { DialogTurn } from "@/lib/types";
+import { DialogCorrection } from "./DialogCorrection";
 import { useAppStore } from "@/store/useAppStore";
 
 interface DialogMessageListProps {
   turns: DialogTurn[];
   isLoading: boolean;
-}
-
-/** Adapt a DialogTurn into the legacy Message shape that chat bubbles expect. */
-function asUserMessage(t: DialogTurn): Message {
-  return {
-    id: t.id + ":user",
-    role: "user",
-    timestamp: t.timestamp,
-    transcript: t.text,
-  };
-}
-
-function asAnalysisMessage(t: DialogTurn): Message | null {
-  if (!t.analysis) return null;
-  return {
-    id: t.id + ":analysis",
-    role: "analysis",
-    timestamp: t.timestamp,
-    analysis: t.analysis,
-  };
-}
-
-function asAiMessage(t: DialogTurn): Message {
-  return {
-    id: t.id + ":ai",
-    role: "ai",
-    timestamp: t.timestamp,
-    aiText: t.text,
-  };
 }
 
 export function DialogMessageList({ turns, isLoading }: DialogMessageListProps) {
@@ -53,25 +23,46 @@ export function DialogMessageList({ turns, isLoading }: DialogMessageListProps) 
     <div className="flex flex-col gap-4 py-4">
       {turns.map((turn) => {
         if (turn.role === "user") {
-          const userMsg = asUserMessage(turn);
-          const analysisMsg = asAnalysisMessage(turn);
           return (
-            <div key={turn.id} className="flex flex-col gap-3">
-              <UserBubble message={userMsg} />
-              {analysisMsg && <AnalysisBubble message={analysisMsg} />}
+            <div key={turn.id} className="flex flex-col gap-2">
+              {/* User bubble (what they actually said) */}
+              <motion.div
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex justify-end px-4"
+              >
+                <div className="max-w-[80%] rounded-2xl rounded-tr-sm bg-orange-100 px-4 py-2.5 text-sm text-orange-900 shadow-sm whitespace-pre-wrap">
+                  {turn.text}
+                </div>
+              </motion.div>
+
+              {/* Compact correction (only if analysis exists) */}
+              {turn.analysis && <DialogCorrection analysis={turn.analysis} />}
             </div>
           );
         }
-        return <AiBubble key={turn.id} message={asAiMessage(turn)} />;
+        // assistant turn (in-role reply or opener)
+        return (
+          <motion.div
+            key={turn.id}
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex justify-start px-4"
+          >
+            <div className="max-w-[80%] rounded-2xl rounded-tl-sm border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-800 shadow-sm whitespace-pre-wrap">
+              {turn.text}
+            </div>
+          </motion.div>
+        );
       })}
 
       {(isLoading || isAnalyzing) && (
         <div className="px-4">
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-white border border-slate-200 px-4 py-2 shadow-sm">
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-4 py-2 shadow-sm">
             {[0, 1, 2].map((i) => (
               <span
                 key={i}
-                className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse"
+                className="h-1.5 w-1.5 animate-pulse rounded-full bg-orange-400"
                 style={{ animationDelay: `${i * 0.15}s` }}
               />
             ))}
