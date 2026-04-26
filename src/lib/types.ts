@@ -54,7 +54,51 @@ export interface TranslationResult {
   errors: GrammarError[];
 }
 
-export type AppMode = "translation" | "conversation" | "correction";
+export type AppMode = "dialog" | "correction" | "progress";
+
+export type Difficulty = "easy" | "medium" | "hard";
+
+export interface Scenario {
+  role: string;
+  situation: string;
+  difficulty: Difficulty;
+  opener: string;
+}
+
+export type DialogTurnRole = "user" | "assistant";
+
+export interface DialogTurn {
+  id: string;
+  role: DialogTurnRole;
+  text: string;
+  analysis?: AnalysisResult;
+  timestamp: number;
+}
+
+export interface DialogChat {
+  id: string;
+  scenario: Scenario;
+  title: string;
+  turns: DialogTurn[];
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface ScenarioRequest {
+  difficulty?: Difficulty;
+  avoid?: { role: string; situation: string }[];
+}
+
+export interface DialogReplyRequest {
+  scenario: Scenario;
+  turns: DialogTurn[];
+  newUserText: string;
+}
+
+export interface DialogReplyResult {
+  analysis: AnalysisResult;
+  reply: string;
+}
 
 export interface CorrectionRequest {
   text: string;

@@ -74,10 +74,10 @@ export const useAppStore = create<AppState>((set) => ({
   selectedErrorId: null,
   setSelectedErrorId: (id) => set({ selectedErrorId: id }),
 
-  targetLanguage: "en",
+  targetLanguage: "de",
   setTargetLanguage: (lang) => set({ targetLanguage: lang }),
 
-  currentMode: "correction",
+  currentMode: "dialog",
   setCurrentMode: (m) => set({ currentMode: m }),
 
   translationDifficulty: "easy",

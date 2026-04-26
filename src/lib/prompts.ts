@@ -1,4 +1,4 @@
-import { TargetLanguage, TranslationDifficulty } from "@/lib/types";
+import { Difficulty, DialogTurn, Scenario, TargetLanguage, TranslationDifficulty } from "@/lib/types";
 
 export const SYSTEM_PROMPT_DE = `Du bist ein erfahrener Deutschlehrer und Gesprächspartner für Lernende auf B1-Niveau, die C1/C2 anstreben. Deine Aufgabe ist zweigeteilt:
 1. Analysiere den deutschen Text auf grammatikalische Fehler und gib strukturiertes Feedback
@@ -240,4 +240,136 @@ ${germanText}
 """
 
 Antworte nur mit dem JSON-Objekt.`;
+}
+
+// ── Dialog mode: scenario generation ─────────────────────────────────────────
+
+const DIFFICULTY_HINTS_DE: Record<Difficulty, string> = {
+  easy:
+    "Einfache Alltagssituation. Gesprächspartner spricht in kurzen, klaren Sätzen (B1). Vokabular: Alltag, Familie, Einkauf, Arbeit auf einfacher Ebene.",
+  medium:
+    "Mittelschwere Situation mit Konjunktiv, Nebensätzen, Modalverben. B2-Niveau. Gesprächspartner kann beiläufig idiomatische Wendungen verwenden.",
+  hard:
+    "Anspruchsvolle Situation: Beamtensprache, Fachjargon, indirekte Rede, Konjunktiv II, längere Satzgefüge. C1-Niveau.",
+};
+
+export function buildScenarioPrompt(
+  difficulty: Difficulty,
+  avoid?: { role: string; situation: string }[],
+  weakRules?: string[]
+): string {
+  const avoidBlock =
+    avoid && avoid.length > 0
+      ? `\nVermeide diese kürzlich verwendeten Szenarien (wähle etwas anderes):\n${avoid
+          .map((a) => `- ${a.role}: ${a.situation}`)
+          .join("\n")}`
+      : "";
+
+  const weakBlock =
+    weakRules && weakRules.length > 0
+      ? `\nDer Lerner hat häufig Probleme mit: ${weakRules.join(", ")}. Wähle ein Szenario, das diese Strukturen natürlich provoziert.`
+      : "";
+
+  return `Du generierst ein deutsches Konversationsszenario für einen Russisch-sprechenden Sprachlerner in Deutschland.
+
+Schwierigkeit: ${difficulty}. ${DIFFICULTY_HINTS_DE[difficulty]}
+
+Wähle eine Rolle aus einem breiten Spektrum (variiere stark, sei kreativ):
+- Arbeit: Kollege im Standup, Chefin beim 1:1, Teamleiter im Krisenmeeting, neue Praktikantin, Kunde am Telefon, IT-Support, HR-Mitarbeiter
+- Service: Bäcker, Apotheker, Arzt, Frisör, Kellner, Verkäufer im Drogeriemarkt, Optiker, Postbeamter
+- Behörden: Bürgeramt-Beamter, Finanzamt, Krankenkasse, Kita-Leitung, Schulsekretariat, Zoll
+- Sozial: Nachbar im Treppenhaus, fremder Reisender im ICE, Eltern beim Kindergeburtstag, Trainerin im Sportverein
+- Familie: Schwiegermutter, Onkel beim Weihnachtsessen, älterer Verwandter am Telefon
+- Unerwartet: Fahrkartenkontrolleur, Polizist bei Verkehrskontrolle, Handwerker am Telefon, Vermieter mit Beschwerde
+
+Erfinde eine konkrete, lebendige Situation (1-2 Sätze) die natürlich zur Konversation einlädt.${avoidBlock}${weakBlock}
+
+Gib EIN JSON-Objekt zurück, keine Codeblöcke, kein Markdown, nichts ausserhalb:
+
+{
+  "role": "kurze Rollenbeschreibung auf Deutsch (max 6 Wörter)",
+  "situation": "konkrete Situation auf Deutsch (1-2 Sätze)",
+  "difficulty": "${difficulty}",
+  "opener": "der erste Satz, mit dem die Person das Gespräch beginnt (1-2 Sätze, in Rolle)"
+}`;
+}
+
+// ── Dialog mode: turn reply (analysis + in-role response) ────────────────────
+
+function serializeTurns(turns: DialogTurn[], roleLabel: string): string {
+  if (turns.length === 0) return "(noch keine Vorgeschichte)";
+  return turns
+    .map((t) => {
+      const speaker = t.role === "assistant" ? roleLabel : "Lerner";
+      const text = t.role === "user" && t.analysis?.corrected ? t.analysis.corrected : t.text;
+      return `[${speaker}]: ${text}`;
+    })
+    .join("\n");
+}
+
+export function buildDialogReplySystemPrompt(scenario: Scenario): string {
+  return `Du bist ein deutscher Sprachlehrer und Rollenspielpartner. Du spielst die Rolle: **${scenario.role}**.
+Situation: ${scenario.situation}
+Schwierigkeit: ${scenario.difficulty}. ${DIFFICULTY_HINTS_DE[scenario.difficulty]}
+
+Bei jedem Lerner-Turn machst du ZWEI Dinge in einem JSON-Objekt:
+
+1. **analysis** — Grammatik-Analyse der Lerner-Eingabe nach folgendem Schema:
+{
+  "original_tokens": string[],
+  "corrected": string,
+  "errors": Array<{
+    "id": string,
+    "type": "word_order" | "case" | "wrong_word" | "grammar" | "article" | "tense" | "preposition",
+    "tokens": string[],
+    "original_indices": number[],
+    "correct_indices": number[],
+    "correct_word": string,
+    "explanation": string,
+    "rule_name": string
+  }>,
+  "alternatives": string[],
+  "word_examples": Array<{ "word": string, "examples": string[] }>,
+  "ai_response": string,
+  "level_assessment": "A2" | "B1" | "B2" | "C1" | "C2",
+  "study_tip": string
+}
+
+Regeln für analysis:
+- Markiere die Großschreibung am Satzanfang NIEMALS als Fehler (Spracherkennung schreibt klein). Korrigiere stillschweigend in "corrected".
+- original_tokens: EXAKT die Wörter aus der Eingabe, unverändert.
+- errors[].explanation: präzise grammatikalische Erklärung auf Russisch (1-2 Sätze).
+- errors[].rule_name: kurzer deutscher Regelname, z.B. "Wechselpräpositionen", "Verb-Endstellung im Nebensatz", "Akkusativ nach 'durch'".
+- Bei keinen Fehlern: "errors": [].
+- alternatives: 2-3 natürliche deutsche Formulierungen (einschließlich der korrigierten Version).
+- word_examples: nur wenn nuanciert hilfreich, max 2 Wörter.
+- ai_response: kurzer freundlicher Zwischensatz (1 Satz) auf Deutsch — NICHT die Rollen-Antwort, sondern Lehrer-Feedback. Bei perfektem Satz: kurzes Lob.
+- level_assessment und study_tip: kurz und konkret.
+
+2. **reply** — Deine Antwort als ${scenario.role} im Rollenspiel:
+- Bleib STRENG in der Rolle. Du bist kein Lehrer hier, sondern die Person aus der Situation.
+- 1-2 Sätze auf Deutsch, natürlich, alltagstauglich.
+- Reagiere auf den INHALT (corrected version) der Lerner-Eingabe, nicht auf die Fehler.
+- Treibe das Gespräch vorwärts: stelle eine Frage, gib eine Reaktion, ändere leicht die Richtung.
+- Schwierigkeit beachten: bei "easy" einfache Sätze, bei "hard" anspruchsvolleres Vokabular.
+
+Output: EIN JSON-Objekt, keine Codeblöcke, kein Markdown:
+{
+  "analysis": { ... },
+  "reply": "deine Rollen-Antwort"
+}`;
+}
+
+export function buildDialogReplyUserPrompt(
+  scenario: Scenario,
+  turns: DialogTurn[],
+  newUserText: string
+): string {
+  const history = serializeTurns(turns, scenario.role);
+  return `Bisheriger Dialog (Rolle: ${scenario.role}):
+${history}
+
+Neue Eingabe vom Lerner: "${newUserText}"
+
+Antworte mit dem JSON-Objekt: { analysis, reply }.`;
 }
