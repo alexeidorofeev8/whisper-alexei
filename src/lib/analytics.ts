@@ -103,9 +103,9 @@ export function aggregateErrorStats(
 
   const typeCounts = new Map<ErrorType, number>();
   const ruleCounts = new Map<string, number>();
-  const dailyTurns = new Map<number, number>();
-  const dailyErrors = new Map<number, number>();
-  const dailyPointsMap = new Map<number, number>();
+  const dailyTurns = new Map<string, number>();
+  const dailyErrors = new Map<string, number>();
+  const dailyPointsMap = new Map<string, number>();
 
   // Iterate user turns CHRONOLOGICALLY (across chats) so streak is correct
   const allUserTurns = chats
@@ -114,8 +114,8 @@ export function aggregateErrorStats(
 
   for (const turn of allUserTurns) {
     totalUserTurns++;
-    const dayStart = localDayStart(turn.timestamp);
-    dailyTurns.set(dayStart, (dailyTurns.get(dayStart) ?? 0) + 1);
+    const dayKey = isoDate(turn.timestamp);
+    dailyTurns.set(dayKey, (dailyTurns.get(dayKey) ?? 0) + 1);
 
     if (lastActivityMs == null || turn.timestamp > lastActivityMs) {
       lastActivityMs = turn.timestamp;
@@ -126,7 +126,7 @@ export function aggregateErrorStats(
     if (errorCount === 0) perfectTurns++;
 
     totalErrors += errorCount;
-    dailyErrors.set(dayStart, (dailyErrors.get(dayStart) ?? 0) + errorCount);
+    dailyErrors.set(dayKey, (dailyErrors.get(dayKey) ?? 0) + errorCount);
 
     for (const e of errs) {
       typeCounts.set(e.type, (typeCounts.get(e.type) ?? 0) + 1);
@@ -137,7 +137,7 @@ export function aggregateErrorStats(
     // Points + streak
     const pts = computeTurnPoints(errorCount, currentStreak);
     totalPoints += pts;
-    dailyPointsMap.set(dayStart, (dailyPointsMap.get(dayStart) ?? 0) + pts);
+    dailyPointsMap.set(dayKey, (dailyPointsMap.get(dayKey) ?? 0) + pts);
 
     if (errorCount === 0) {
       currentStreak++;
@@ -156,26 +156,32 @@ export function aggregateErrorStats(
     .sort((a, b) => b.count - a.count)
     .slice(0, 10);
 
-  // Build daily buckets for last `windowDays` days, oldest -> newest
+  // Build daily buckets for last `windowDays` days, oldest -> newest.
+  // Walk via Date.setDate so DST transitions don't double-count days.
   const byDay: DailyBucket[] = [];
   const dailyPoints: { date: string; startMs: number; points: number }[] = [];
-  const todayStart = localDayStart(Date.now());
-  for (let i = windowDays - 1; i >= 0; i--) {
-    const startMs = todayStart - i * 86_400_000;
-    const turns = dailyTurns.get(startMs) ?? 0;
-    const errors = dailyErrors.get(startMs) ?? 0;
+  const cursor = new Date();
+  cursor.setHours(0, 0, 0, 0);
+  cursor.setDate(cursor.getDate() - (windowDays - 1));
+  for (let i = 0; i < windowDays; i++) {
+    const ms = cursor.getTime();
+    const key = isoDate(ms);
+    const turns = dailyTurns.get(key) ?? 0;
+    const errors = dailyErrors.get(key) ?? 0;
     byDay.push({
-      date: isoDate(startMs),
-      startMs,
+      date: key,
+      startMs: ms,
       turns,
       errors,
       errorRate: turns > 0 ? errors / turns : 0,
     });
     dailyPoints.push({
-      date: isoDate(startMs),
-      startMs,
-      points: dailyPointsMap.get(startMs) ?? 0,
+      date: key,
+      startMs: ms,
+      points: dailyPointsMap.get(key) ?? 0,
     });
+    cursor.setDate(cursor.getDate() + 1);
+    cursor.setHours(0, 0, 0, 0);
   }
 
   return {
@@ -237,13 +243,19 @@ export function buildHeatmap(chats: DialogChat[], weeks = 53): DayStat[] {
   const today = new Date(todayMs);
   const todayDow = today.getDay();
   const totalDays = todayDow + 1 + (weeks - 1) * 7;
-  const startMs = todayMs - (totalDays - 1) * 86_400_000;
+
+  // Walk via Date.setDate so DST transitions don't collapse two cells onto
+  // the same calendar date (e.g. the autumn fall-back when 24h after local
+  // midnight is still the previous calendar day).
+  const cursor = new Date(todayMs);
+  cursor.setDate(cursor.getDate() - (totalDays - 1));
+  cursor.setHours(0, 0, 0, 0);
 
   const grid: DayStat[] = [];
   for (let i = 0; i < totalDays; i++) {
-    const ms = startMs + i * 86_400_000;
+    const ms = cursor.getTime();
     const iso = isoDate(ms);
-    const dow = new Date(ms).getDay();
+    const dow = cursor.getDay();
     grid.push(
       byDate.get(iso) ?? {
         date: iso,
@@ -255,6 +267,8 @@ export function buildHeatmap(chats: DialogChat[], weeks = 53): DayStat[] {
         points: 0,
       }
     );
+    cursor.setDate(cursor.getDate() + 1);
+    cursor.setHours(0, 0, 0, 0);
   }
   return grid;
 }
