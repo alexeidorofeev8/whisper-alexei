@@ -10,6 +10,17 @@ export interface DailyBucket {
   errorRate: number;
 }
 
+export interface DayStat {
+  date: string;
+  startMs: number;
+  /** day-of-week 0=Sun..6=Sat */
+  dow: number;
+  turns: number;
+  errors: number;
+  perfectTurns: number;
+  points: number;
+}
+
 export interface FortschrittStats {
   totalUserTurns: number;
   totalErrors: number;
@@ -181,6 +192,71 @@ export function aggregateErrorStats(
     longestStreak,
     dailyPoints,
   };
+}
+
+/**
+ * Build a GitHub-style daily heatmap covering the last `weeks` weeks,
+ * always ending on today and starting on the Sunday of the earliest week.
+ * Inactive days are present (turns=0). Result is grid-friendly: cells fill
+ * a CSS grid with 7 rows top-to-bottom, oldest column first.
+ */
+export function buildHeatmap(chats: DialogChat[], weeks = 53): DayStat[] {
+  const byDate = new Map<string, DayStat>();
+
+  const allUserTurns = chats
+    .flatMap((c) => c.turns.filter((t) => t.role === "user"))
+    .sort((a, b) => a.timestamp - b.timestamp);
+
+  let streak = 0;
+  for (const turn of allUserTurns) {
+    const dayStartMs = localDayStart(turn.timestamp);
+    const iso = isoDate(dayStartMs);
+    let s = byDate.get(iso);
+    if (!s) {
+      s = {
+        date: iso,
+        startMs: dayStartMs,
+        dow: new Date(dayStartMs).getDay(),
+        turns: 0,
+        errors: 0,
+        perfectTurns: 0,
+        points: 0,
+      };
+      byDate.set(iso, s);
+    }
+    s.turns++;
+    const errs = turn.analysis?.errors ?? [];
+    const errorCount = errs.length;
+    s.errors += errorCount;
+    if (errorCount === 0) s.perfectTurns++;
+    s.points += computeTurnPoints(errorCount, streak);
+    streak = errorCount === 0 ? streak + 1 : 0;
+  }
+
+  const todayMs = localDayStart(Date.now());
+  const today = new Date(todayMs);
+  const todayDow = today.getDay();
+  const totalDays = todayDow + 1 + (weeks - 1) * 7;
+  const startMs = todayMs - (totalDays - 1) * 86_400_000;
+
+  const grid: DayStat[] = [];
+  for (let i = 0; i < totalDays; i++) {
+    const ms = startMs + i * 86_400_000;
+    const iso = isoDate(ms);
+    const dow = new Date(ms).getDay();
+    grid.push(
+      byDate.get(iso) ?? {
+        date: iso,
+        startMs: ms,
+        dow,
+        turns: 0,
+        errors: 0,
+        perfectTurns: 0,
+        points: 0,
+      }
+    );
+  }
+  return grid;
 }
 
 const TYPE_LABELS_DE: Record<ErrorType, string> = {

@@ -4,18 +4,19 @@ import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { Sparkles, MessageCircle, AlertCircle, CheckCircle2 } from "lucide-react";
 import { useDialogStore } from "@/store/useDialogStore";
-import { aggregateErrorStats } from "@/lib/analytics";
+import { aggregateErrorStats, buildHeatmap } from "@/lib/analytics";
 import { TypeBars } from "./TypeBars";
-import { DailyTrend } from "./DailyTrend";
 import { TopRules } from "./TopRules";
 import { Fehlerbericht } from "./Fehlerbericht";
 import { GameCard } from "./GameCard";
+import { Heatmap } from "./Heatmap";
 
 export function FortschrittInterface() {
   const chats = useDialogStore((s) => s.chats);
   const hasHydrated = useDialogStore((s) => s.hasHydrated);
 
   const stats = useMemo(() => aggregateErrorStats(chats, 14), [chats]);
+  const heatmap = useMemo(() => buildHeatmap(chats, 53), [chats]);
 
   if (!hasHydrated) {
     return (
@@ -55,13 +56,12 @@ export function FortschrittInterface() {
           </p>
         </header>
 
-        {/* Gamification card — points + streak + daily points sparkline */}
+        {/* Gamification card — points + streak */}
         <section className="mb-6">
           <GameCard
             totalPoints={stats.totalPoints}
             currentStreak={stats.currentStreak}
             longestStreak={stats.longestStreak}
-            dailyPoints={stats.dailyPoints}
           />
         </section>
 
@@ -89,12 +89,12 @@ export function FortschrittInterface() {
           />
         </div>
 
-        {/* Trend last 14 days */}
+        {/* GitHub-style heatmap — last ~53 weeks */}
         <section className="mb-6 rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
-          <h2 className="mb-2 text-xs font-semibold uppercase tracking-wider text-stone-500">
-            Aktivität & Fehlerrate
+          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-stone-500">
+            Aktivitäts-Heatmap (letztes Jahr)
           </h2>
-          <DailyTrend byDay={stats.byDay} />
+          <Heatmap days={heatmap} />
         </section>
 
         {/* By type */}
