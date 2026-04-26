@@ -61,7 +61,11 @@ export function DialogInterface() {
             </div>
 
             <div className="flex-1 overflow-y-auto">
-              <DialogMessageList turns={activeChat.turns} isLoading={false} />
+              <DialogMessageList
+                turns={activeChat.turns}
+                role={activeChat.scenario.role}
+                isLoading={false}
+              />
             </div>
 
             {error && (

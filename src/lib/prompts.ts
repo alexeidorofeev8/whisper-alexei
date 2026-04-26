@@ -350,11 +350,11 @@ Regeln für analysis:
 - alternatives, word_examples: leer lassen ([]).
 - ai_response: leerer String — wir nutzen das Feld nicht.
 - level_assessment und study_tip: ein einzelnes kurzes Wort/Satz reicht (z.B. "B2", "weiter so").
-- native_variant: PFLICHT-Feld. Eine VOLLSTÄNDIG umformulierte Version, wie sie ein deutscher Muttersprachler im Alltag tatsächlich SAGEN würde. Nicht nur Grammatik-Korrektur — anderer Satzbau, andere Reihenfolge, idiomatische Wendungen, natürliche Verkürzungen, aktive Konstruktionen. Wenn der Originalsatz schon komplett natürlich klingt, darf native_variant gleich corrected sein. KEINE doppelten Anführungszeichen.
+- native_variant: PFLICHT-Feld. Eine SANFT umformulierte Version, wie ein deutscher Muttersprachler den GLEICHEN Inhalt natürlicher ausdrücken würde. WICHTIG: der SINN bleibt nahezu identisch — nicht stark verändern, nicht stark kürzen, keine zusätzlichen Informationen. Erlaubt: leicht andere Wortwahl, natürlichere Reihenfolge, eine idiomatische Wendung, eine kleine Modalpartikel (mal, doch, eben, halt). Verboten: drastische Umstellung, Gefühlsfärbung hinzufügen, Inhalt weglassen oder ergänzen, Slang. Wenn der Originalsatz bereits natürlich klingt, darf native_variant gleich corrected sein. KEINE doppelten Anführungszeichen.
   Beispiel — Original: "ich bin sorry aber gestern haben wir party gemacht und es war ein bisschen lauter als ublich":
   - corrected: "Ich entschuldige mich, aber gestern haben wir eine Party gefeiert, und es war ein bisschen lauter als üblich."
-  - native_variant: "Sorry für gestern — wir hatten ne kleine Feier, da ist es halt etwas lauter geworden."
-  Der native_variant ist erkennbar anders strukturiert: lockerer Anfang, Gedankenstrich, Kurzform 'ne, Modalpartikel 'halt'.
+  - native_variant: "Tut mir leid, aber wir hatten gestern eine Party und da wurde es leider etwas lauter als sonst."
+  Beachte: der Sinn ist praktisch derselbe, nur der Ton ist natürlicher und das Vokabular alltäglicher.
 
 2. **reply** — Deine Antwort als ${scenario.role} im Rollenspiel:
 - Bleib STRENG in der Rolle. Du bist kein Lehrer hier, sondern die Person aus der Situation.
