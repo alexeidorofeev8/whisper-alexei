@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useDialog } from "@/hooks/useDialog";
 import { useAppStore } from "@/store/useAppStore";
-import { InputBar } from "@/components/voice/InputBar";
+import { VoiceOnlyButton } from "@/components/correction/VoiceOnlyButton";
 import { DialogSidebar } from "./DialogSidebar";
 import { ScenarioCard } from "./ScenarioCard";
 import { DialogMessageList } from "./DialogMessageList";
@@ -73,12 +73,8 @@ export function DialogInterface() {
             )}
 
             <div className="border-t border-stone-200 bg-white/90 backdrop-blur-xl">
-              <div className="mx-auto w-full max-w-5xl px-2">
-                <InputBar
-                  onSubmit={sendUserTurn}
-                  placeholder="Antworte auf Deutsch…"
-                  speechLang="de-DE"
-                />
+              <div className="mx-auto w-full max-w-5xl">
+                <VoiceOnlyButton onSubmit={sendUserTurn} speechLang="de-DE" />
               </div>
             </div>
           </>
