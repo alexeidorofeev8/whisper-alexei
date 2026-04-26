@@ -9,6 +9,7 @@ import { TypeBars } from "./TypeBars";
 import { DailyTrend } from "./DailyTrend";
 import { TopRules } from "./TopRules";
 import { Fehlerbericht } from "./Fehlerbericht";
+import { GameCard } from "./GameCard";
 
 export function FortschrittInterface() {
   const chats = useDialogStore((s) => s.chats);
@@ -53,6 +54,16 @@ export function FortschrittInterface() {
             Wird mit jeder Nachricht aktualisiert
           </p>
         </header>
+
+        {/* Gamification card — points + streak + daily points sparkline */}
+        <section className="mb-6">
+          <GameCard
+            totalPoints={stats.totalPoints}
+            currentStreak={stats.currentStreak}
+            longestStreak={stats.longestStreak}
+            dailyPoints={stats.dailyPoints}
+          />
+        </section>
 
         <div className="mb-6 grid grid-cols-3 gap-3">
           <StatTile

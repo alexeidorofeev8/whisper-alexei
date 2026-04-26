@@ -8,6 +8,7 @@ import { DialogSidebar } from "./DialogSidebar";
 import { ScenarioCard } from "./ScenarioCard";
 import { DialogMessageList } from "./DialogMessageList";
 import { EmptyState } from "./EmptyState";
+import { StreakBadge } from "./StreakBadge";
 
 export function DialogInterface() {
   const setTargetLanguage = useAppStore((s) => s.setTargetLanguage);
@@ -53,6 +54,9 @@ export function DialogInterface() {
         ) : (
           <>
             <div className="px-4 pt-4">
+              <div className="mb-2 flex items-center justify-end">
+                <StreakBadge />
+              </div>
               <ScenarioCard scenario={activeChat.scenario} />
             </div>
 

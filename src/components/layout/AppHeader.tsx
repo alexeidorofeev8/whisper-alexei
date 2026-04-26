@@ -5,7 +5,6 @@ import { AppMode } from "@/lib/types";
 
 const MODE_TABS: { value: AppMode; label: string }[] = [
   { value: "dialog", label: "💬 Dialog" },
-  { value: "correction", label: "✍️ Korrektur" },
   { value: "progress", label: "📊 Fortschritt" },
 ];
 
