@@ -2,15 +2,11 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, MessageCircle } from "lucide-react";
 import { AnalysisResult, GrammarError } from "@/lib/types";
 
 interface DialogCorrectionProps {
   originalText: string;
   analysis?: AnalysisResult;
-  /** AI's in-role reply that follows this user turn (rendered in the right column). */
-  assistantText?: string;
-  assistantRole?: string;
 }
 
 /** Render a string with **bold** markdown segments. */
@@ -52,7 +48,7 @@ function ErrorToken({ token, error }: ErrorTokenProps) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 4, scale: 0.96 }}
             transition={{ duration: 0.12 }}
-            className="pointer-events-none absolute bottom-full left-1/2 z-30 mb-1.5 w-max max-w-[260px] -translate-x-1/2 rounded-lg border border-amber-200 bg-amber-100 px-2.5 py-1.5 text-xs leading-snug text-amber-900 shadow-md"
+            className="pointer-events-none absolute bottom-full left-1/2 z-30 mb-1.5 w-max max-w-[240px] -translate-x-1/2 rounded-lg border border-amber-200 bg-amber-100 px-2.5 py-1.5 text-xs leading-snug text-amber-900 shadow-md"
             role="tooltip"
           >
             {renderBold(error.rule_name || "Fehler")}
@@ -63,7 +59,6 @@ function ErrorToken({ token, error }: ErrorTokenProps) {
   );
 }
 
-/** Build a render of original_tokens with pale-yellow highlights on error tokens. */
 function HighlightedOriginal({
   tokens,
   errors,
@@ -75,7 +70,7 @@ function HighlightedOriginal({
 }) {
   if (!tokens || tokens.length === 0) {
     return (
-      <p lang="de" className="text-sm leading-relaxed text-stone-700 whitespace-pre-wrap md:text-[15px]">
+      <p lang="de" className="text-sm leading-relaxed text-stone-700 whitespace-pre-wrap">
         {fallbackText}
       </p>
     );
@@ -89,7 +84,7 @@ function HighlightedOriginal({
   }
 
   return (
-    <p lang="de" className="text-sm leading-relaxed text-stone-700 md:text-[15px]">
+    <p lang="de" className="text-sm leading-relaxed text-stone-700">
       {tokens.map((tok, i) => {
         const error = indexToError.get(i);
         const isPunct = /^[.,!?;:]/.test(tok);
@@ -105,26 +100,21 @@ function HighlightedOriginal({
   );
 }
 
-export function DialogCorrection({
-  originalText,
-  analysis,
-  assistantText,
-  assistantRole,
-}: DialogCorrectionProps) {
-  // No analysis at all — just original on left, nothing on right
+export function DialogCorrection({ originalText, analysis }: DialogCorrectionProps) {
+  // No analysis at all — just original on left
   if (!analysis) {
     return (
       <motion.div
         initial={{ opacity: 0, y: 4 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.18 }}
-        className="mx-auto w-full max-w-6xl px-4"
+        className="mx-auto w-full max-w-3xl px-4"
       >
-        <div className="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm md:p-5">
+        <div className="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
           <h4 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-stone-500">
             Du sagtest
           </h4>
-          <p lang="de" className="text-sm leading-relaxed text-stone-800 whitespace-pre-wrap md:text-[15px]">
+          <p lang="de" className="text-sm leading-relaxed text-stone-800 whitespace-pre-wrap">
             {originalText}
           </p>
         </div>
@@ -132,21 +122,23 @@ export function DialogCorrection({
     );
   }
 
+  // Right column: prefer the native-style rephrase if it adds value, else just corrected.
+  const nativeRewrite =
+    analysis.native_variant && analysis.native_variant.trim().length > 0
+      ? analysis.native_variant.trim()
+      : analysis.corrected;
+
   const hasErrors = analysis.errors.length > 0;
-  const showNative =
-    analysis.native_variant &&
-    analysis.native_variant.trim().length > 0 &&
-    analysis.native_variant.trim() !== analysis.corrected.trim();
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 4 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.18 }}
-      className="mx-auto w-full max-w-6xl px-4"
+      className="mx-auto w-full max-w-3xl px-4"
     >
-      <div className="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm md:p-5">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
+      <div className="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5">
 
           {/* LEFT — original with pale-yellow error highlights */}
           <div>
@@ -160,44 +152,17 @@ export function DialogCorrection({
             />
           </div>
 
-          {/* RIGHT — corrected + native variant + AI reply */}
-          <div className="flex flex-col gap-4 md:border-l md:border-stone-100 md:pl-6">
-
-            <section>
-              <h4 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-600">
-                Korrigiert
-              </h4>
-              {hasErrors ? (
-                <p lang="de" className="text-sm font-medium leading-relaxed text-slate-900 md:text-[15px]">
-                  {analysis.corrected}
-                </p>
-              ) : (
-                <p className="text-xs text-emerald-700">✓ Alles korrekt</p>
-              )}
-            </section>
-
-            {showNative && (
-              <section className="border-t border-stone-100 pt-3">
-                <h4 className="mb-1.5 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-orange-600">
-                  <Sparkles className="h-3 w-3" />
-                  Wie ein Muttersprachler
-                </h4>
-                <p lang="de" className="text-sm italic leading-relaxed text-stone-700 md:text-[15px]">
-                  {analysis.native_variant}
-                </p>
-              </section>
-            )}
-
-            {assistantText && (
-              <section className="border-t border-stone-100 pt-3">
-                <h4 className="mb-1.5 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-stone-500">
-                  <MessageCircle className="h-3 w-3" />
-                  {assistantRole ?? "Antwort"}
-                </h4>
-                <p lang="de" className="text-sm leading-relaxed text-slate-800 whitespace-pre-wrap md:text-[15px]">
-                  {assistantText}
-                </p>
-              </section>
+          {/* RIGHT — single block: how a native would say it */}
+          <div className="md:border-l md:border-stone-100 md:pl-5">
+            <h4 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-600">
+              Korrigiert
+            </h4>
+            {hasErrors || nativeRewrite !== originalText ? (
+              <p lang="de" className="text-sm font-medium leading-relaxed text-slate-900">
+                {nativeRewrite}
+              </p>
+            ) : (
+              <p className="text-xs text-emerald-700">✓ Alles korrekt</p>
             )}
           </div>
         </div>

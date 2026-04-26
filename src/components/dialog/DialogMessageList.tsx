@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { Fragment, useEffect, useMemo, useRef } from "react";
 import { motion } from "framer-motion";
 import { DialogTurn } from "@/lib/types";
 import { DialogCorrection } from "./DialogCorrection";
@@ -18,7 +18,6 @@ interface TurnGroup {
   key: string;
 }
 
-/** Pair user→assistant turns into one group; standalone assistant turns (the opener) become their own group. */
 function groupTurns(turns: DialogTurn[]): TurnGroup[] {
   const groups: TurnGroup[] = [];
   for (let i = 0; i < turns.length; i++) {
@@ -38,6 +37,27 @@ function groupTurns(turns: DialogTurn[]): TurnGroup[] {
   return groups;
 }
 
+function AssistantBubble({ text, role }: { text: string; role: string }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 4 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="mx-auto w-full max-w-3xl px-4"
+    >
+      <div className="flex justify-start">
+        <div className="max-w-[85%]">
+          <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-stone-400">
+            {role}
+          </p>
+          <div className="rounded-2xl rounded-tl-sm border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-800 shadow-sm whitespace-pre-wrap">
+            {text}
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 export function DialogMessageList({ turns, role, isLoading }: DialogMessageListProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const isAnalyzing = useAppStore((s) => s.isAnalyzing);
@@ -49,39 +69,28 @@ export function DialogMessageList({ turns, role, isLoading }: DialogMessageListP
   }, [turns.length, isAnalyzing, isLoading]);
 
   return (
-    <div className="flex flex-col gap-4 py-4">
+    <div className="flex flex-col gap-3 py-4">
       {groups.map((g) => {
         if (g.user) {
           return (
-            <DialogCorrection
-              key={g.key}
-              originalText={g.user.text}
-              analysis={g.user.analysis}
-              assistantText={g.assistant?.text}
-              assistantRole={role}
-            />
+            <Fragment key={g.key}>
+              <DialogCorrection
+                originalText={g.user.text}
+                analysis={g.user.analysis}
+              />
+              {g.assistant && (
+                <AssistantBubble text={g.assistant.text} role={role} />
+              )}
+            </Fragment>
           );
         }
-        // Standalone assistant turn — typically the scenario opener
+        // Standalone assistant turn (the scenario opener)
         const a = g.assistant!;
-        return (
-          <motion.div
-            key={g.key}
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mx-auto w-full max-w-6xl px-4"
-          >
-            <div className="flex justify-start">
-              <div className="max-w-[80%] rounded-2xl rounded-tl-sm border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-800 shadow-sm whitespace-pre-wrap">
-                {a.text}
-              </div>
-            </div>
-          </motion.div>
-        );
+        return <AssistantBubble key={g.key} text={a.text} role={role} />;
       })}
 
       {(isLoading || isAnalyzing) && (
-        <div className="mx-auto w-full max-w-6xl px-4">
+        <div className="mx-auto w-full max-w-3xl px-4">
           <div className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-4 py-2 shadow-sm">
             {[0, 1, 2].map((i) => (
               <span
