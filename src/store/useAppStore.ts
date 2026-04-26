@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import {
+  AppMode,
   Message,
   RecordingState,
   TargetLanguage,
@@ -36,8 +37,8 @@ interface AppState {
   targetLanguage: TargetLanguage;
   setTargetLanguage: (lang: TargetLanguage) => void;
 
-  translationMode: boolean;
-  setTranslationMode: (v: boolean) => void;
+  currentMode: AppMode;
+  setCurrentMode: (m: AppMode) => void;
 
   translationDifficulty: TranslationDifficulty;
   setTranslationDifficulty: (d: TranslationDifficulty) => void;
@@ -76,8 +77,8 @@ export const useAppStore = create<AppState>((set) => ({
   targetLanguage: "en",
   setTargetLanguage: (lang) => set({ targetLanguage: lang }),
 
-  translationMode: true,
-  setTranslationMode: (v) => set({ translationMode: v }),
+  currentMode: "translation",
+  setCurrentMode: (m) => set({ currentMode: m }),
 
   translationDifficulty: "easy",
   setTranslationDifficulty: (d) => set({ translationDifficulty: d }),

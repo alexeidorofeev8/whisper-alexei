@@ -1,14 +1,9 @@
-import Anthropic from "@anthropic-ai/sdk";
 import { getSystemPrompt, buildUserPrompt } from "@/lib/prompts";
 import { AnalysisResult, TargetLanguage } from "@/lib/types";
-import { parseClaudeJson } from "@/lib/utils";
-
-const client = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY!,
-});
+import { generateJson } from "@/lib/llm";
 
 export async function POST(req: Request) {
-  const { transcript, targetLanguage = "de" } = await req.json() as {
+  const { transcript, targetLanguage = "de" } = (await req.json()) as {
     transcript: string;
     targetLanguage?: TargetLanguage;
   };
@@ -18,41 +13,19 @@ export async function POST(req: Request) {
   }
 
   try {
-    const message = await client.messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: 2048,
-      system: [
-        {
-          type: "text",
-          text: getSystemPrompt(targetLanguage),
-          cache_control: { type: "ephemeral" },
-        },
-      ],
-      messages: [
-        {
-          role: "user",
-          content: buildUserPrompt(transcript, targetLanguage),
-        },
-      ],
-    });
-
-    const raw =
-      message.content[0].type === "text" ? message.content[0].text : "";
-
-    let parsed: AnalysisResult;
-    try {
-      parsed = parseClaudeJson<AnalysisResult>(raw);
-    } catch {
-      console.error("Raw Claude response:", raw);
-      return Response.json(
-        { error: "Invalid JSON from Claude", raw },
-        { status: 500 }
-      );
-    }
+    const parsed = await generateJson<AnalysisResult>(
+      buildUserPrompt(transcript, targetLanguage),
+      {
+        max_tokens: 2048,
+        system: getSystemPrompt(targetLanguage),
+        cacheSystem: true,
+      }
+    );
 
     return Response.json(parsed);
   } catch (error) {
-    console.error("Claude API error:", error);
-    return Response.json({ error: "Analysis failed" }, { status: 500 });
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error("[analyze] error:", msg);
+    return Response.json({ error: "Analysis failed", detail: msg }, { status: 500 });
   }
 }

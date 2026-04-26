@@ -54,6 +54,19 @@ export interface TranslationResult {
   errors: GrammarError[];
 }
 
+export type AppMode = "translation" | "conversation" | "correction";
+
+export interface CorrectionRequest {
+  text: string;
+}
+
+export interface CorrectionResult {
+  corrected: string;
+  native_variant?: string;
+  notes: string[];
+  tip?: string;
+}
+
 export type MessageRole = "user" | "analysis" | "ai" | "translation" | "phrase";
 
 export interface Message {
